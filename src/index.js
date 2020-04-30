@@ -20,7 +20,7 @@ async function Main()
 {
     // Realiza toda a configuração inicial do programa
     bot.setup();
-
+    
     // Inicia o bot
     bot.start();
 }

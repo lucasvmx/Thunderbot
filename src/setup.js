@@ -16,13 +16,35 @@
 
 const { Client } = require('whatsapp-web.js');
 const handler = require('./handlers');
-const client = new Client();
+const filesystem = require("fs");
+
+// Caminho do arquivo de sessão
+const SESSION_FILE_PATH = "./thunderbot.dat";
+let client;
+
+// Verifica se já exista uma seção salva
+if(filesystem.existsSync(SESSION_FILE_PATH)) 
+{
+    // Carrega a sessão antiga
+    let sessionData = filesystem.readFileSync(SESSION_FILE_PATH).toString();
+    
+    // Inicializa o cliente
+    client = new Client({session: sessionData});
+} else {
+    // Inicializa o cliente
+    client = new Client();
+}
 
 /**
  * Realiza as configurações iniciais do programa
  */
 this.setup = function()
 {
+    // Chamada quando o usuário se autentica
+    client.on('authenticated', (session) => {
+        handler.on_user_authenticated(session);
+    });
+
     // Handler para gerar QR code
     client.on('qr', (qr) => {
         handler.generate_qr_code(qr);
@@ -47,3 +69,7 @@ this.start = function()
     // Inicializa o cliente
     client.initialize();
 };
+
+// Símbolos exportados
+this.SESSION_FILE = SESSION_FILE_PATH;
+this._client = client;

@@ -14,34 +14,88 @@
     limitations under the License.
 */
 
-const qrcode = require('qrcode-terminal');
+const qrcode = require("qrcode-terminal");
+const bot = require('./setup');
+let fs = require("fs");
+require("log-timestamp");
 
 /**
  * 
  * @param {*} qr 
  */
-this.generate_qr_code = function (qr)
+function GenerateQRCode(qr)
 {
     qrcode.generate(qr, {small: true});
-};
+}
 
 /**
  * 
  */
-this.on_client_ready = function()
+function OnClientReady()
 {
-    console.log("Cliente configurado");
-};
+    // Exibe o status online
+    bot._client.sendPresenceAvailable();
+
+    // Avisa ao usuário que está pronto para receber mensagens
+    console.log("Carregamento concluído. Aguardando mensagens ...");
+}
 
 /**
  * 
  * @param {*} msg 
  */
-this.on_message_received = function(msg)
+function OnMessageReceived(msg)
 {
+    let chat = msg.getChat();
+    let chatId = chat.id;
+
     // Mensagens de grupo serão ignoradas
-    if(msg.getChat().isGroup === true) {
+    if(chat.isGroup === true) {
         return;
     }
-};
 
+    // Responde o usuário
+    msg.reply(msg.body, chatId);
+}
+
+/**
+ * 
+ * @param {*} state 
+ */
+function OnClientStateChanged(state)
+{
+    if(state === "TIMEOUT")
+        process.exit(0);  
+}
+
+/**
+ * 
+ * @param {*} Session 
+ */
+function OnUserAuthenticated(Session)
+{
+    console.log(Session);
+    
+    // Salva a sessão
+    saveSession(Session);
+}
+
+/**
+ * 
+ * @param {*} Session Sessão a ser salva
+ */
+function saveSession(Session)
+{
+    fs.writeFileSync(bot.SESSION_FILE, JSON.stringify(Session), function(err) {
+        if(err) {
+            console.log("Failed to save session");
+        }
+    });
+}
+
+// Exporta as funções
+this.on_user_authenticated = OnUserAuthenticated;
+this.on_client_state_changed = OnClientStateChanged;
+this.on_message_received = OnMessageReceived;
+this.on_client_ready = OnClientReady;
+this.generate_qr_code = GenerateQRCode;
