@@ -1,4 +1,4 @@
-![.github/workflows/node-ci.yml](https://github.com/lucas-engen/thunderbot/workflows/.github/workflows/node-ci.yml/badge.svg?branch=dev)
+![Node.js CI](https://github.com/lucas-engen/thunderbot/workflows/Node.js%20CI/badge.svg?branch=dev)
 
 # thunderbot
 
