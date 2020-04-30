@@ -4,7 +4,7 @@
   "description": "Bot de Whatsapp focado em empresas de pequeno porte",
   "main": "src/index.js",
   "scripts": {
-    "test": "node src/index.js",
+    "test": "node src/tests/test.js",
     "pack": "pkg ."
   },
   "bin": "src/index.js",
