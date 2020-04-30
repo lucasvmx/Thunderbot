@@ -1,0 +1,38 @@
+{
+  "name": "thunderbot",
+  "version": "0.0.1",
+  "description": "Bot de Whatsapp focado em empresas de pequeno porte",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "node src/index.js",
+    "pack": "pkg ."
+  },
+  "bin": "src/index.js",
+  "pkg": {
+    "scripts": "src/*.js",
+    "targets": [
+      "node12-win",
+      "node12-linux"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://gitlab.com/whatsappbot2/thunderbot.git"
+  },
+  "keywords": [
+    "thunderbot",
+    "whatsapp-bot"
+  ],
+  "author": "Lucas Vieira de Jesus",
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://gitlab.com/whatsappbot2/thunderbot/issues"
+  },
+  "homepage": "https://gitlab.com/whatsappbot2/thunderbot#readme",
+  "dependencies": {
+    "pkg": "^4.4.8",
+    "qrcode-terminal": "^0.12.0",
+    "run": "^1.4.0",
+    "whatsapp-web.js": "^1.5.1"
+  }
+}
