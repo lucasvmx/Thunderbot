@@ -13,13 +13,11 @@
         [
             {
                 "contem_texto": [ "" ],
-                "resposta_contem_txt": [ "" ],
+                "resposta_contem_txt": "",
                 "resposta_contem_img": "",
                 "resposta_contem_loc": "",
-
-
                 "texto_exato": [ "" ],
-                "resposta_exato_txt": [ "" ],
+                "resposta_exato_txt": "",
                 "resposta_exato_img": "",
                 "resposta_exato_loc": ""
             }
