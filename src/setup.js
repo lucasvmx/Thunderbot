@@ -17,29 +17,38 @@
 const { Client } = require('whatsapp-web.js');
 const handler = require('./handlers');
 const filesystem = require("fs");
+const { Settings, Folders } = require("./constants");
 
-// Caminho do arquivo de sessão
-const SESSION_FILE_PATH = "./thunderbot.dat";
 let client;
-
-// Verifica se já exista uma seção salva
-if(filesystem.existsSync(SESSION_FILE_PATH)) 
-{
-    // Carrega a sessão antiga
-    let sessionData = filesystem.readFileSync(SESSION_FILE_PATH).toString();
-    
-    // Inicializa o cliente
-    client = new Client({session: sessionData});
-} else {
-    // Inicializa o cliente
-    client = new Client();
-}
 
 /**
  * Realiza as configurações iniciais do programa
  */
 this.setup = function()
 {
+    let sessionData;
+
+    // Verifica se já existe uma seção salva
+    if(filesystem.existsSync(Settings.SESSION_FILE))
+    {
+        // Carrega a sessão antiga
+        sessionData = require(`${process.cwd()}/${Settings.SESSION_FILE}`);
+
+        // Inicializa o cliente
+        client = new Client({session: sessionData, restartOnAuthFail: true});
+
+    } else {
+        // Inicializa o cliente
+        client = new Client({restartOnAuthFail: true});
+    }
+
+    // Cria as pastas necessárias
+    if(!filesystem.existsSync(Folders.SESSION_FOLDER))
+        filesystem.mkdirSync(Folders.SESSION_FOLDER);
+    
+    if(!filesystem.existsSync(Folders.SETTINGS_FOLDER))
+        filesystem.mkdirSync(Folders.SETTINGS_FOLDER);
+    
     // Chamada quando o usuário se autentica
     client.on('authenticated', (session) => {
         handler.on_user_authenticated(session);
@@ -47,6 +56,7 @@ this.setup = function()
 
     // Handler para gerar QR code
     client.on('qr', (qr) => {
+        console.log(`QR code obtido: ${qr}`);
         handler.generate_qr_code(qr);
     });
     
@@ -59,6 +69,23 @@ this.setup = function()
     client.on('message', (message) => {
         handler.on_message_received(message);
     });
+
+    // É acionada quando o cliente não consegue se autenticar
+    client.on('auth_failure', (message) => {
+
+        // Exibe a mensagem de erro
+        console.log(`A autenticação falhou: ${message}. Gerando QR code ...`);
+        
+        // Deleta a sessão antiga
+        filesystem.unlinkSync(Settings.SESSION_FILE);
+    });
+
+    client.on('change_state', (state) => {
+        // TODO: Tratar mudanças de estado
+    });
+
+    // Símbolos exportados
+    this._client = client;
 };
 
 /**
@@ -69,7 +96,3 @@ this.start = function()
     // Inicializa o cliente
     client.initialize();
 };
-
-// Símbolos exportados
-this.SESSION_FILE = SESSION_FILE_PATH;
-this._client = client;

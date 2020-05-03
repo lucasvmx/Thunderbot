@@ -5,11 +5,16 @@
   "main": "src/index.js",
   "scripts": {
     "test": "node src/tests/test.js",
+    "start": "node src/index.js",
     "pack": "pkg ."
   },
   "bin": "src/index.js",
   "pkg": {
     "scripts": "src/*.js",
+    "assets": [
+      "settings/*.json",
+      "session/thunderbot.json"
+    ],
     "targets": [
       "node12-win",
       "node12-linux"

@@ -16,8 +16,26 @@
 
 var bot = require('./setup');
 
+/**
+ * 
+ */
+function setup_process_handlers()
+{
+    // Instala os handlers para o processo principal
+    process.on('unhandledRejection', (reason, promise) => {
+        console.log(`Rejeição não tratada: ${reason}: ${promise}`);
+        process.exit(0);
+    });
+}
+
+/**
+ * 
+ */
 async function Main()
 {
+    // Configura os handlers para tratar os erros ocorridos no event loop
+    setup_process_handlers();
+
     // Realiza toda a configuração inicial do programa
     bot.setup();
     
