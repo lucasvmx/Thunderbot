@@ -25,11 +25,11 @@ async function doTests()
 }
 
 // Realiza os testes
-doTests().then((rejected) => {
-    console.log("Passed");
+doTests().then((passed) => {
+    console.log(`Passed: ${passed}`);
     process.exit(0);
 }, (reason) => {
-    console.log("Rejected");
+    console.log(`Rejected: ${reason}`);
     console.log(reason);
     process.exit(1);
 });
