@@ -10,25 +10,26 @@
         "mensagem":
         [
             {
-                "contem_texto": [ "lucas" ],
-                "resposta_contem_txt": "oi :)",
-                "resposta_contem_img": "eu ainda não consigo baixar arquivos de mídia :(",
-                "resposta_contem_loc": "",
-                "texto_exato": [ "oi" ],
+                "texto_exato": [ "lucas", "oi", "hello" ],
                 "resposta_exato_txt": "diga pessoa",
                 "resposta_exato_img": "",
-                "resposta_exato_loc": ""
+                "resposta_exato_loc": "",
+                "contem_texto": [ "" ],
+                "resposta_contem_txt": "",
+                "resposta_contem_img": "eu ainda não consigo baixar arquivos de mídia :(",
+                "resposta_contem_loc": ""
             }
         ],
         "resposta_padrao": 
         {
-            "conteudo": "C:\\bot\\default.txt",
+            "conteudo": "this is a test",
             "resposta_por_periodo_habilitada": false,
             "resposta_periodo": 
             {
                 "manha": "/path/to/manha.txt",
                 "tarde": "/path/to/tarde.txt",
-                "noite": "/path/to/noite.txt"
+                "noite": "/path/to/noite.txt",
+                "madrugada": "/path/to/madrugada.txt"
             }          
         }
     }
