@@ -51,26 +51,21 @@ class botSettings
      */
     InstallWatcher()
     {
-        let wait = false;
+        const timeout = 5000;
 
         // Inicializa o watcher
         fs.watch(Settings.SETTINGS_FILE, (eventType, filename) => {
 
             if(eventType === 'change')
             {
-                if(wait) return;
-                
-                // Aguarda 100 milissegundos para configurar a flag e impedir a chamada sucessiva desta função
-                wait = setTimeout(()=> {
-                    wait = true;
-                }, 100);
-
-                // Carrega as informações de configuração
-                this.bot_settings_object = this.Load();
+                // Carrega as informações de configuração (após 5 segundos)
+                setTimeout(() => {
+                    this.bot_settings_object = this.Load();
+                }, timeout);
             } else if(eventType == 'rename')
             {
                 // Deixa de monitorar o arquivo
-                fs.unwatchFile(Settings.SETTINGS_FILE);
+                process.emitWarning("O arquivo de configurações foi renomeado!!!");
             }
         });
     }
@@ -82,6 +77,9 @@ class botSettings
     {
         // Declara a variável
         var json_obj = '';
+        var old_obj = this.bot_settings_object;
+
+        console.log("Carregando configurações ...");
 
         // Verifica se o arquivo de configurações existe
         if(!fs.existsSync(Settings.SETTINGS_FILE))
@@ -101,7 +99,7 @@ class botSettings
             console.log(`Falha ao carregar configurações: ${err}`);
             
             // Em caso de erro, as configurações antigas devem continuar
-            return;
+            return old_obj;
         }
 
         return json_obj;

@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-const bot = require("../setup");
+const bot = require("../bot_setup");
 
 async function doTests()
 {

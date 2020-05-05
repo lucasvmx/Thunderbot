@@ -16,7 +16,7 @@
 
 const { Client } = require('whatsapp-web.js');
 const { Settings, Folders } = require("./constants");
-const handler = require('./handlers');
+const handler = require('./client_handler');
 const filesystem = require("fs");
 
 let client;
@@ -32,7 +32,7 @@ this.setup = function()
     if(filesystem.existsSync(Settings.SESSION_FILE))
     {
         // Carrega a sessão antiga
-        sessionData = require(`${process.cwd()}/${Settings.SESSION_FILE}`);
+        sessionData = require(`${Settings.SESSION_FILE}`);
 
         // Inicializa o cliente
         client = new Client({session: sessionData, restartOnAuthFail: true});

@@ -14,16 +14,24 @@
     limitations under the License.
 */
 
-var bot = require('./setup');
+var bot = require('./bot_setup');
 
 /**
- * 
+ * Instala os handlers para o processo principal
  */
 function setup_process_handlers()
 {
-    // Instala os handlers para o processo principal
-    process.on('unhandledRejection', (reason, promise) => {
-        console.log(`Rejeição não tratada: ${reason}: ${promise}`);
+    // Handler para tratar rejeições
+    process.on('unhandledRejection', (reason, promise) => 
+    {
+        console.log(`${reason.toString()}`);
+    });
+
+    // Handler para tratar a saída do programa
+    process.on('exit', (code) => 
+    {
+        if(code != 0)
+            console.log("Algo deu errado. Reinicie o programa");
     });
 }
 

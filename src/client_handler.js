@@ -16,10 +16,10 @@
 
 require("log-timestamp");
 const qrcode = require("qrcode-terminal");
-const bot = require('./setup');
+const bot = require('./bot_setup');
 var fs = require("fs");
 const { Settings, ReturnCodes } = require("./constants");
-const { BotSettings } = require('./settings');
+const { BotSettings } = require('./bot_settings');
 const { MessageTypes } = require("whatsapp-web.js/src/util/Constants");
 var BotConfig = new BotSettings();
 
@@ -157,42 +157,42 @@ function BuildMessageResponse(messageBody, msg)
     // Obtém a resposta adequada
     try 
     {
-        BotConfig.GetSettings().robo.mensagem.forEach((element) => {
+        BotConfig.GetSettings().robo.mensagem.forEach((message_object) => {
 
-            // Realiza a busca similar
-            element.contem_texto.forEach((subelement) => 
+            // Realiza a busca exata
+            message_object.texto_exato.forEach((message_object_item) => 
             {
                 // Verifica se a mensagem enviada contém algum dos textos
-                if(messageBody.search(subelement) != -1)
+                if(messageBody === message_object_item)
                 {
                     // Verifica o tipo da mensagem
                     if(msg.hasMedia) {
-                        messageResponse = element.resposta_contem_img;
+                        messageResponse = message_object.resposta_exato_img;
                     } else if(msg.type === MessageTypes.LOCATION) {
-                        messageResponse = element.resposta_contem_loc;
+                        messageResponse = message_object.resposta_exato_loc;
                     } else {
-                        messageResponse = element.resposta_contem_txt;
+                        messageResponse = message_object.resposta_exato_txt;
                     }
-
+                    
                     throw ReturnCodes.RESPONSE_FOUND;
                 }
             });
 
-            // Realiza a busca exata
-            element.texto_exato.forEach((subelement) => 
+            // Realiza a busca similar
+            message_object.contem_texto.forEach((message_object_item) => 
             {
                 // Verifica se a mensagem enviada contém algum dos textos
-                if(messageBody === subelement)
+                if(messageBody.search(message_object_item) != -1)
                 {
                     // Verifica o tipo da mensagem
                     if(msg.hasMedia) {
-                        messageResponse = element.resposta_exato_img;
+                        messageResponse = message_object.resposta_contem_img;
                     } else if(msg.type === MessageTypes.LOCATION) {
-                        messageResponse = element.resposta_exato_loc;
+                        messageResponse = message_object.resposta_contem_loc;
                     } else {
-                        messageResponse = element.resposta_exato_txt;
+                        messageResponse = message_object.resposta_contem_txt;
                     }
-                    
+
                     throw ReturnCodes.RESPONSE_FOUND;
                 }
             });            
@@ -201,7 +201,7 @@ function BuildMessageResponse(messageBody, msg)
     {
         if(code === ReturnCodes.RESPONSE_FOUND)
         {                        
-            // Responde o usuário
+            // Retorna a resposta (se ela não for vazia)
             if(messageResponse.length > 0)
                 return messageResponse;
         }
@@ -234,8 +234,11 @@ function BuildMessageResponse(messageBody, msg)
             {
                 value = BotConfig.GetSettings().robo.resposta_padrao.resposta_periodo.noite;
             } else {
-                // TODO: tratar respostas da madrugada
-            }            
+                value = BotConfig.GetSettings().robo.resposta_padrao.resposta_periodo.madrugada;
+            }      
+            
+            // Configura a resposta
+            messageResponse = value;
         } else 
         {
             // É um arquivo existente em disco?
