@@ -24,7 +24,6 @@ function setup_process_handlers()
     // Instala os handlers para o processo principal
     process.on('unhandledRejection', (reason, promise) => {
         console.log(`Rejeição não tratada: ${reason}: ${promise}`);
-        process.exit(0);
     });
 }
 

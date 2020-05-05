@@ -5,7 +5,7 @@
   "main": "src/index.js",
   "scripts": {
     "test": "node src/tests/test.js",
-    "start": "node src/index.js",
+    "start": "node --trace-deprecation src/index.js",
     "pack": "pkg ."
   },
   "bin": "src/index.js",

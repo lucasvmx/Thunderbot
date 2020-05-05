@@ -15,9 +15,9 @@
 */
 
 const { Client } = require('whatsapp-web.js');
+const { Settings, Folders } = require("./constants");
 const handler = require('./handlers');
 const filesystem = require("fs");
-const { Settings, Folders } = require("./constants");
 
 let client;
 
@@ -36,7 +36,6 @@ this.setup = function()
 
         // Inicializa o cliente
         client = new Client({session: sessionData, restartOnAuthFail: true});
-
     } else {
         // Inicializa o cliente
         client = new Client({restartOnAuthFail: true});
@@ -73,15 +72,13 @@ this.setup = function()
     // É acionada quando o cliente não consegue se autenticar
     client.on('auth_failure', (message) => {
 
-        // Exibe a mensagem de erro
-        console.log(`A autenticação falhou: ${message}. Gerando QR code ...`);
-        
-        // Deleta a sessão antiga
-        filesystem.unlinkSync(Settings.SESSION_FILE);
+        // Trata o erro de autenticação
+        handler.on_auth_failed(message);
     });
 
     client.on('change_state', (state) => {
-        // TODO: Tratar mudanças de estado
+        // Trata a mudança de estado
+        handler.on_client_state_changed(state);
     });
 
     // Símbolos exportados

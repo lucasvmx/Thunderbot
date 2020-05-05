@@ -43,7 +43,7 @@ class botSettings
         this.bot_settings_object = this.Load();
 
         // Instala um watcher para atualizar as configurações em tempo real
-        this.InstallWatcher();
+       this.InstallWatcher();
     }
 
     /**
@@ -51,16 +51,27 @@ class botSettings
      */
     InstallWatcher()
     {
+        let wait = false;
+
         // Inicializa o watcher
-        var watcher = fs.watch(Settings.SETTINGS_FILE, { persistent: true, interval: 10000 });
+        fs.watch(Settings.SETTINGS_FILE, (eventType, filename) => {
 
-        // Registra um callback
-        watcher.on('change', (event, filename) => {
+            if(eventType === 'change')
+            {
+                if(wait) return;
+                
+                // Aguarda 100 milissegundos para configurar a flag e impedir a chamada sucessiva desta função
+                wait = setTimeout(()=> {
+                    wait = true;
+                }, 100);
 
-            console.log("Recarregando configurações em disco ...");
-
-            // Atualiza as informações de configuração
-            this.bot_settings_object = this.Load();
+                // Carrega as informações de configuração
+                this.bot_settings_object = this.Load();
+            } else if(eventType == 'rename')
+            {
+                // Deixa de monitorar o arquivo
+                fs.unwatchFile(Settings.SETTINGS_FILE);
+            }
         });
     }
 
@@ -70,7 +81,7 @@ class botSettings
     Load()
     {
         // Declara a variável
-        var json_obj;
+        var json_obj = '';
 
         // Verifica se o arquivo de configurações existe
         if(!fs.existsSync(Settings.SETTINGS_FILE))
@@ -82,9 +93,16 @@ class botSettings
 
         // Abre o arquivo de configurações
         var contents = fs.readFileSync(Settings.SETTINGS_FILE).toString();
-        
+
         // Retorna um objeto JSON
-        json_obj = JSON.parse(contents);
+        try {            
+            json_obj = JSON.parse(contents);
+        } catch(err) {
+            console.log(`Falha ao carregar configurações: ${err}`);
+            
+            // Em caso de erro, as configurações antigas devem continuar
+            return;
+        }
 
         return json_obj;
     }

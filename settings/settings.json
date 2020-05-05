@@ -3,40 +3,28 @@
     {
         "exibir_status_online": true,
         "responder_grupos": false,
-
         "log_de_mensagens": {
             "ativado": false,
             "tam_maximo_log_kbytes": 20480
         },
-
         "mensagem":
         [
             {
-                "contem_texto": [ "" ],
-                "resposta_contem_txt": "",
-                "resposta_contem_img": "",
+                "contem_texto": [ "lucas" ],
+                "resposta_contem_txt": "oi :)",
+                "resposta_contem_img": "eu ainda não consigo baixar arquivos de mídia :(",
                 "resposta_contem_loc": "",
-                "texto_exato": [ "" ],
-                "resposta_exato_txt": "",
+                "texto_exato": [ "oi" ],
+                "resposta_exato_txt": "diga pessoa",
                 "resposta_exato_img": "",
                 "resposta_exato_loc": ""
             }
         ],
-        
-        "comandos":
-        [
-            {
-                "texto": "",
-                "resposta": ""
-            }
-        ],
-
         "resposta_padrao": 
         {
-            "nome_empresa": "",
-            "conteudo": "/path/to/conteudo.txt",
+            "conteudo": "C:\\bot\\default.txt",
             "resposta_por_periodo_habilitada": false,
-            "periodo": 
+            "resposta_periodo": 
             {
                 "manha": "/path/to/manha.txt",
                 "tarde": "/path/to/tarde.txt",
