@@ -21,12 +21,6 @@ var bot = require('./bot_setup');
  */
 function setup_process_handlers()
 {
-    // Handler para tratar rejeições
-    process.on('unhandledRejection', (reason, promise) => 
-    {
-        console.log(`${reason.toString()}`);
-    });
-
     // Handler para tratar a saída do programa
     process.on('exit', (code) => 
     {
@@ -44,10 +38,10 @@ async function Main()
     setup_process_handlers();
 
     // Realiza toda a configuração inicial do programa
-    bot.setup();
+    await bot.setup();
     
     // Inicia o bot
-    bot.start();
+    await bot.start();
 }
 
 // Executa as tarefas

@@ -131,8 +131,8 @@ async function HandleMessageReceived(msg)
     }
 
     // TODO: Verificar se a mensagem deve ser logada
-    // if(logActivated)
-        
+    if(logActivated)
+        console.log(msg.body);
 
     // Visualiza a mensagem
     chat.sendSeen();

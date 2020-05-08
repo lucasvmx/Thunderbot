@@ -18,36 +18,14 @@ const { Client } = require('whatsapp-web.js');
 const { Settings, Folders } = require("./constants");
 const handler = require('./client_handler');
 const filesystem = require("fs");
-
+let path = require("path");
+const downloader = require('./browser_downloader');
+const puppeteer = require("puppeteer-core");
 let client;
 
-/**
- * Realiza as configurações iniciais do programa
- */
-this.setup = function()
+
+function register_client_handlers()
 {
-    let sessionData;
-
-    // Verifica se já existe uma seção salva
-    if(filesystem.existsSync(Settings.SESSION_FILE))
-    {
-        // Carrega a sessão antiga
-        sessionData = require(`${Settings.SESSION_FILE}`);
-
-        // Inicializa o cliente
-        client = new Client({session: sessionData, restartOnAuthFail: true});
-    } else {
-        // Inicializa o cliente
-        client = new Client({restartOnAuthFail: true});
-    }
-
-    // Cria as pastas necessárias
-    if(!filesystem.existsSync(Folders.SESSION_FOLDER))
-        filesystem.mkdirSync(Folders.SESSION_FOLDER);
-    
-    if(!filesystem.existsSync(Folders.SETTINGS_FOLDER))
-        filesystem.mkdirSync(Folders.SETTINGS_FOLDER);
-    
     // Chamada quando o usuário se autentica
     client.on('authenticated', (session) => {
         handler.on_user_authenticated(session);
@@ -55,7 +33,6 @@ this.setup = function()
 
     // Handler para gerar QR code
     client.on('qr', (qr) => {
-        console.log(`QR code obtido: ${qr}`);
         handler.generate_qr_code(qr);
     });
     
@@ -71,7 +48,6 @@ this.setup = function()
 
     // É acionada quando o cliente não consegue se autenticar
     client.on('auth_failure', (message) => {
-
         // Trata o erro de autenticação
         handler.on_auth_failed(message);
     });
@@ -80,6 +56,74 @@ this.setup = function()
         // Trata a mudança de estado
         handler.on_client_state_changed(state);
     });
+}
+
+/**
+ * Realiza as configurações iniciais do programa
+ */
+this.setup = async function()
+{
+    let sessionData;
+    var puppeteer_options;
+    var browserPath;
+    var browserVersion;
+
+    try 
+    {
+        // Obtém o número da versão mais recente do browser para a plataforma
+        browserVersion = await downloader.GetBrowserVersion();
+
+        // Se o browser já existe, então essa função irá apenas retornar a sua localização no disco
+        browserPath = await downloader.GetBrowser(browserVersion).then(value => {
+
+            console.log( "=> " + value);
+
+            // Configura o caminho do browser
+            puppeteer_options = { executablePath: value };
+        });
+    } catch(error) 
+    {
+        console.error(error);
+        process.exit(0);
+    }
+
+    console.log("Opções: " + browserPath);
+    console.log(puppeteer_options);
+
+    // Verifica se já existe uma seção salva
+    if(filesystem.existsSync(Settings.SESSION_FILE))
+    {
+        // Carrega a sessão antiga
+        sessionData = require(`${process.cwd()}/${Settings.SESSION_FILE}`);
+
+        // Inicializa o cliente
+        try {
+            client = new Client({session: sessionData, restartOnAuthFail: true, puppeteer: puppeteer_options});
+        } catch(error)
+        {
+            console.error("Falha ao inicializar cliente: " + error);
+            process.exit(0);
+        }
+    } else 
+    {
+        // Inicializa o cliente
+        try {
+            client = new Client({restartOnAuthFail: true, puppeteer: puppeteer_options});
+        } catch(error) {
+            console.error("Falha ao inicializar cliente: " + error);
+            process.exit(0);
+        }
+    }
+
+    // Cria as pastas necessárias
+    if(!filesystem.existsSync(Folders.SESSION_FOLDER))
+        filesystem.mkdirSync(Folders.SESSION_FOLDER);
+    
+    if(!filesystem.existsSync(Folders.SETTINGS_FOLDER))
+        filesystem.mkdirSync(Folders.SETTINGS_FOLDER);
+    
+    // Registra os handlers para o cliente
+    register_client_handlers();
 
     // Símbolos exportados
     this._client = client;
@@ -88,7 +132,7 @@ this.setup = function()
 /**
  * Inicializa o cliente
  */
-this.start = function()
+this.start = async function()
 {
     // Inicializa o cliente
     client.initialize();
