@@ -78,7 +78,7 @@ async function GetRevisionNumber()
                     
                     if (key === "branch_base_position" && can_print) 
                     {                    
-                        if(!have_revision && typeof(value) != undefined) {
+                        if (!have_revision && typeof(value) != undefined) {
                             have_revision = true;
                             revision_number = value;
                             

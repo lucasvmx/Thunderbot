@@ -83,7 +83,7 @@ this.setup = async function()
         });
     } catch(error) 
     {
-        console.error(error);
+        console.error(error.toString());
         process.exit(0);
     }
 
