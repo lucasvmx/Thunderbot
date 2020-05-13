@@ -1,6 +1,6 @@
 {
   "name": "thunderbot",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "Bot de Whatsapp focado em empresas de pequeno porte",
   "main": "src/index.js",
   "scripts": {
@@ -38,7 +38,7 @@
     "cli-spinner": "^0.2.10",
     "log-timestamp": "^0.3.0",
     "pkg": "^4.4.8",
-    "puppeteer-core": "^3.0.2",
+    "puppeteer-core": "^3.0.4",
     "qrcode-terminal": "^0.12.0",
     "run": "^1.4.0",
     "whatsapp-web.js": "^1.5.1"
