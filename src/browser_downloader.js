@@ -122,13 +122,15 @@ async function DownloadBrowser(revision_number)
         if(browserExists)
             resolve(fetcher.revisionInfo(local_revisions[0]).executablePath);
 
+        console.log(`O Browser já existe`);
+    
         // Verifica se é possível baixar a versão especificada
         if(!fetcher.canDownload(revision_number)) 
         {
             reject(`A versão ${revision_number} não pode ser baixada`);
             return;
         }
-        
+
         console.log("Iniciando download ...");
 
         // Configura o spin progress
@@ -136,10 +138,9 @@ async function DownloadBrowser(revision_number)
         spinner.start();
 
         let start, end, speed = 0, progress = 0;
-        var browser;
 
         // Baixa o browser
-        browser = fetcher.download(revision_number, (downloaded, total) => {
+        let browser = fetcher.download(revision_number, (downloaded, total) => {
 
             // Pega o número de bytes transferido
             start = total - downloaded;
@@ -167,12 +168,16 @@ async function DownloadBrowser(revision_number)
 
             // Chama a função reject
             reject(error);
-        }).finally(() => {
+
+        }).finally(() => 
+        {
+            let exePath;
+
             // Para o spinner
             spinner.stop();
 
             // Se dá como resolvida no término do download e passa o caminho do browser baixado
-            resolve(browser.executablePath);
+            resolve(exePath);
         });
     });
 }

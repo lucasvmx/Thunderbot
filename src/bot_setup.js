@@ -65,7 +65,6 @@ this.setup = async function()
 {
     let sessionData;
     var puppeteer_options;
-    var browserPath;
     var browserVersion;
 
     try 
@@ -74,20 +73,17 @@ this.setup = async function()
         browserVersion = await downloader.GetBrowserVersion();
 
         // Se o browser já existe, então essa função irá apenas retornar a sua localização no disco
-        browserPath = await downloader.GetBrowser(browserVersion).then(value => {
-
-            console.log( "=> " + value);
+        await downloader.GetBrowser(browserVersion).then(value => {
 
             // Configura o caminho do browser
             puppeteer_options = { executablePath: value };
-        });
+        });    
     } catch(error) 
     {
         console.error(error.toString());
         process.exit(0);
     }
 
-    console.log("Opções: " + browserPath);
     console.log(puppeteer_options);
 
     // Verifica se já existe uma seção salva
