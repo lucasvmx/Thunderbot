@@ -56,3 +56,32 @@ exports.ReturnCodes = {
      */
     RESPONSE_FOUND: 1
 };
+
+/**
+ * Canais de desenvolvimento do browser (estável, dev, etc)
+ */
+exports.BrowserChannels = {
+
+    /**
+    * Canal estável
+    */
+    STABLE_CHANNEL: "stable",
+
+    /**
+    * Canal de desenvolvimento
+    */
+    DEV_CHANNEL: "dev",
+
+    /**
+    * Canal 'canary'
+    */  
+    CANARY_CHANNEL: "canary"
+};
+
+exports.FileOpenModes = {
+
+    /**
+    * Abre o arquivo no modo de inserção (síncrono). O arquivo será criado, caso não exista
+    */
+    APPEND_SYNC: "as"
+};

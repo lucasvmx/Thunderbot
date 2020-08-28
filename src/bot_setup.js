@@ -56,6 +56,12 @@ function register_client_handlers()
         // Trata a mudança de estado
         handler.on_client_state_changed(state);
     });
+
+    client.on('disconnected', (state) => {
+
+    });
+
+    console.info("Cliente configurado com sucesso. Aguarde pelo QR code ...");
 }
 
 /**
@@ -66,6 +72,8 @@ this.setup = async function()
     let sessionData;
     var puppeteer_options;
     var browserVersion;
+
+    console.info("Fazendo configurações iniciais ...");
 
     try 
     {
@@ -80,11 +88,11 @@ this.setup = async function()
         });    
     } catch(error) 
     {
-        console.error(error.toString());
+        console.error(error.toString().toLocaleLowerCase());
         process.exit(0);
     }
 
-    console.log(puppeteer_options);
+    console.info("Navegador web configurado com sucesso");
 
     // Verifica se já existe uma seção salva
     if(filesystem.existsSync(Settings.SESSION_FILE))
@@ -118,6 +126,14 @@ this.setup = async function()
     if(!filesystem.existsSync(Folders.SETTINGS_FOLDER))
         filesystem.mkdirSync(Folders.SETTINGS_FOLDER);
     
+    // Verifica se o configurações existe
+    if(!filesystem.existsSync(`${Settings.SETTINGS_FILE}`)) {
+        console.error("O arquivo de configurações não existe!");
+        process.exit(0);
+    }
+
+    console.info("Configurando o cliente de Whatsapp ...");
+
     // Registra os handlers para o cliente
     register_client_handlers();
 

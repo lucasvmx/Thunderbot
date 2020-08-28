@@ -26,7 +26,7 @@ class botSettings
     constructor() 
     {
         // Inicializa a variável interna
-        this.bot_settings_object;
+        this.bot_settings_object = "";
     }
 
     GetSettings()

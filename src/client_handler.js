@@ -17,12 +17,26 @@
 require("log-timestamp");
 const qrcode = require("qrcode-terminal");
 const bot = require('./bot_setup');
-var fs = require("fs");
 const { Settings, ReturnCodes } = require("./constants");
 const { BotSettings } = require('./bot_settings');
 const { MessageTypes } = require("whatsapp-web.js/src/util/Constants");
+const { MessageLogger } = require('./message_logger');
+const { Utils } = require('./utils');
+var fs = require("fs");
+
+
+var Logger = new MessageLogger();
 var BotConfig = new BotSettings();
 
+/**
+ * Tamanho do log (bytes)
+ */
+var logSize = 0;
+
+/**
+ * Flag para armazenar se o log foi ativado
+ */
+var logActivated = false;
 
 /**
  * 
@@ -34,7 +48,7 @@ async function GenerateQRCode(qr)
 }
 
 /**
- * 
+ * É chamada quando o cliente está pronto
  */
 async function OnClientReady()
 {
@@ -48,7 +62,13 @@ async function OnClientReady()
     // Verifica se o log está ativado
     if(BotConfig.GetSettings().robo.log_de_mensagens.ativado)
     {
-        // TODO: criar arquivo de log
+        console.info("O log de mensagens está ativado");
+        logSize = parseInt(BotConfig.GetSettings().robo.log_de_mensagens.tam_maximo_log_bytes, 10);
+        logActivated = true;
+        Logger = new MessageLogger(logSize);
+        Logger.start_logger();
+    } else {
+        Logger = undefined;
     }
 
     // Avisa ao usuário que está pronto para receber mensagens
@@ -70,8 +90,10 @@ async function OnMessageReceived(msg)
  */
 async function OnClientStateChanged(state)
 {
-    if(state === "TIMEOUT")
-        process.exit(0);  
+    if(state === "TIMEOUT") {
+        console.log("Timeout detectado");
+        process.exit(0);
+    }  
 }
 
 /**
@@ -119,20 +141,26 @@ function saveSession(Session)
  */
 async function HandleMessageReceived(msg)
 {
-    var chat = await msg.getChat();
-    //var contact = await msg.getContact();
-    var body = String(msg.body).toLowerCase();
-    //var logActivated = BotConfig.GetSettings().robo.log_de_mensagens.ativado;
-    var response = '';
+    let chat = await msg.getChat();
+    let contact = await msg.getContact();
+    let profilePicUrl = await contact.getProfilePicUrl();
+    let body = String(msg.body).toLowerCase();
+    let response = '';
 
     // Verifica se as mensagens de grupo devem ser ignoradas
     if((BotConfig.GetSettings().robo.responder_grupos == false) && (chat.isGroup)) {
         return;
     }
 
-    // TODO: Verificar se a mensagem deve ser logada
-    if(logActivated)
-        console.log(msg.body);
+    if(logActivated) 
+    {
+        if(typeof(Logger) != undefined) {
+            Logger.register_log(`${Utils.GetDateTimeFromUnixTimestamp(msg.timestamp)} - ${contact.pushname}@${contact.number}: ${msg.body}`);
+        } else {
+            console.error("O logger não foi inicializado corretamente");
+            process.exit(0);
+        }
+    }
 
     // Visualiza a mensagem
     chat.sendSeen();
@@ -141,7 +169,8 @@ async function HandleMessageReceived(msg)
     response = BuildMessageResponse(body, msg);
 
     // Responde ao contato
-    msg.reply(response);
+    // msg.reply - reponde uma mensagem em específico
+    chat.sendMessage(response);
 }
 
  /**
@@ -217,11 +246,9 @@ function BuildMessageResponse(messageBody, msg)
         {
             // Responde de acordo com a hora do dia
             var dateObj = new Date(Date.now());
-            var hour, minute, second;
+            var hour;
 
             hour = dateObj.getHours();
-            minute = dateObj.getMinutes();
-            second = dateObj.getSeconds();
 
             // Obtém o valor contido na chave da resposta padrão, porém de acordo com o turno do dia
             if(((hour >= 6) && (hour <= 11))) 
@@ -253,6 +280,11 @@ function BuildMessageResponse(messageBody, msg)
     return messageResponse;
 }
 
+async function OnClientDisconnected(state)
+{
+    console.log("Perdemos a conexão! Motivo: " + state);
+}
+
 // Exporta as funções públicas
 this.on_user_authenticated = OnUserAuthenticated;
 this.on_client_state_changed = OnClientStateChanged;
@@ -260,3 +292,4 @@ this.on_message_received = OnMessageReceived;
 this.on_client_ready = OnClientReady;
 this.on_auth_failed = OnAuthFailed;
 this.generate_qr_code = GenerateQRCode;
+this.on_client_disconnected = OnClientDisconnected;
