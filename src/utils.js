@@ -50,7 +50,7 @@ class utils
         let day, month, year, hour, minute, second, ms;
 
         day = "0" + dt.getDate();
-        month = "0" + dt.getMonth();
+        month = "0" + (dt.getMonth() + 1);
         year = dt.getFullYear();
         hour = "0" + dt.getHours();
         minute = "0" + dt.getMinutes();
