@@ -14,52 +14,8 @@
     limitations under the License.
 */
 
-//const os = require("os");
-//const http_client = require("http");
 const puppeteer = require("puppeteer-core");
-//const { win32 } = require("path");
-//const { BrowserChannels } = require("./constants");
 var Spinner = require("cli-spinner").Spinner;
-
-// Usada para verificar se a revisão foi baixada
-//let have_revision = false;
-
-/**
- * Obtém o sistema operacional atualmente em execução
- */
-/*
-function GetOSName()
-{
-    let system = "";
-    let arch = "";
-
-    // Obtém a plataforma atual
-    system = os.platform();
-    arch = os.arch();
-
-    switch(system)
-    {
-        case "win32":
-            if(arch === "x64")
-                system = "win64";
-            else
-                system = "win";
-        break;
-
-        case "linux":
-        break;
-
-        case "darwin":
-            system = "macos";
-        break;
-
-        default:
-            system = "unrecognized";
-    }
-
-    return system;
-}
-*/
 
 /**
  * Obtém o número de revisão do Browser mais recente da plataforma
@@ -67,74 +23,10 @@ function GetOSName()
 async function GetRevisionNumber()
 {   
     let revision_number = 782078;
-    //var our_os = "win";//GetOSName();
-    //var sel_channel = BrowserChannels.CANARY_CHANNEL;
-    //var request_url = `http://omahaproxy.appspot.com/all.json?os=${our_os}&channel=${sel_channel}`;
-
-    //console.log(request_url);
 
     return new Promise((resolve, reject) => 
     {
         resolve(revision_number);
-
-        /*
-        // Envia a request HTTP
-        const req = http_client.request(request_url, (Incoming) => 
-        {
-            // Armazena os dados
-            let json_data = "";
-            
-            // Recebe os dados e salva num arquivo
-            Incoming.on('data', (chunk) => {
-                json_data += chunk;
-            });
-            
-            // Faz o processamento do JSON
-            Incoming.on('end', () => 
-            {
-                // Analisa o JSON devolvido
-                var operating_systems = JSON.parse(json_data);
-                let limit = operating_systems.length;
-
-                for(let i = 0; i < limit; i++) 
-                {
-                    // Se não for a nossa plataforma, vá para a próxima iteração
-                    if(operating_systems[i].os != our_os)
-                        continue;
-
-                    let versions_limit = operating_systems[i].versions.length;
-
-                    for(let j = 0; j < versions_limit; j++) {
-
-                        // Obtém o nome do canal
-                        let channel_name = operating_systems[i].versions[j].channel;
-                        
-                        // Se o canal for estável, então podemos pegar o número de revisão e sair
-                        if(channel_name === sel_channel) {
-                            revision_number = operating_systems[i].versions[j].branch_base_position;
-                            have_revision = true;
-                            break;
-                        }
-                    }
-                }
-
-                if(!have_revision)
-                    reject("Número de revisão não localizado");
-                else
-                    resolve(`${revision_number}`);
-            });
-        });
-
-        req.on("error", (err) => {
-            console.log("Erro ao obter número de revisão");
-            console.log("Certifique-se de que você possui conexão com a internet");
-            console.log("Se o problema persistir, verifique as configurações do seu firewall");
-            reject(err);
-        });
-
-        // Finaliza a request
-        req.end();
-        */
     });
 }
 

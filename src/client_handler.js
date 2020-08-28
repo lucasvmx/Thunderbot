@@ -14,6 +14,7 @@
     limitations under the License.
 */
 
+
 require("log-timestamp");
 const qrcode = require("qrcode-terminal");
 const bot = require('./bot_setup');
@@ -173,6 +174,74 @@ async function HandleMessageReceived(msg)
     chat.sendMessage(response);
 }
 
+/**
+ * @brief Constrói uma resposta exata para o texto especificado
+ * 
+ * @param {string} messageBody Corpo da mensagem recebida
+ * @param {Object} message_object Objeto da mensagem no JSON
+ * @param {import("whatsapp-web.js").Message} msg Instância para a classe Message
+ */
+function BuildExactTextResponse(messageBody, message_object, msg)
+{
+    let messageResponse = "";
+
+    message_object.texto_exato.forEach((exact_text) => 
+    {
+        if(exact_text.length > 0)
+        {
+            // Realiza a busca exata
+            if(messageBody === exact_text)
+            {    
+                // Verifica o tipo da mensagem
+                if(msg.hasMedia) {
+                    messageResponse = message_object.resposta_exato_img;
+                } else if(msg.type === MessageTypes.LOCATION) {
+                    messageResponse = message_object.resposta_exato_loc;
+                } else {
+                    messageResponse = message_object.resposta_exato_txt;
+                }
+
+                return messageResponse;
+            }
+        }
+    });
+    
+    return messageResponse;
+}
+
+/**
+ * @brief Constrói uma resposta caso o texto similar seja encontrado
+ * 
+ * @param {string} messageBody Corpo da mensagem recebida
+ * @param {Object} message_object Objeto da mensagem no JSON
+ * @param {import("whatsapp-web.js").Message} msg Instância para a classe Message
+ */
+function BuildSimilarTextResponse(messageBody, message_object, msg)
+{
+    let messageResponse = "";
+
+    message_object.contem_texto.forEach((similar_text) => 
+    {
+        if(similar_text.length > 0)
+        {
+            // Realiza a busca exata
+            if(messageBody === similar_text)
+            {   
+                // Verifica o tipo da mensagem
+                if(msg.hasMedia) {
+                    messageResponse = message_object.resposta_exato_img;
+                } else if(msg.type === MessageTypes.LOCATION) {
+                    messageResponse = message_object.resposta_exato_loc;
+                } else {
+                    messageResponse = message_object.resposta_exato_txt;
+                }
+            }
+        }
+    });
+
+    return messageResponse;
+}
+
  /**
   * Constrói uma resposta para a mensagem recebida e a retorna
   * 
@@ -181,50 +250,21 @@ async function HandleMessageReceived(msg)
   */
 function BuildMessageResponse(messageBody, msg)
 {
-    var messageResponse = "";
+    let messageResponse = "";
 
     // Obtém a resposta adequada
     try 
     {
         BotConfig.GetSettings().robo.mensagem.forEach((message_object) => {
+            
+            // Constrói as responstas. Uma exceção será lançada caso a resposta seja encontrada
+            messageResponse = BuildExactTextResponse(messageBody, message_object, msg);
+            if(messageResponse.length > 0) 
+                throw ReturnCodes.RESPONSE_FOUND;
 
-            // Realiza a busca exata
-            message_object.texto_exato.forEach((message_object_item) => 
-            {
-                // Verifica se a mensagem enviada contém algum dos textos
-                if(messageBody === message_object_item)
-                {
-                    // Verifica o tipo da mensagem
-                    if(msg.hasMedia) {
-                        messageResponse = message_object.resposta_exato_img;
-                    } else if(msg.type === MessageTypes.LOCATION) {
-                        messageResponse = message_object.resposta_exato_loc;
-                    } else {
-                        messageResponse = message_object.resposta_exato_txt;
-                    }
-                    
-                    throw ReturnCodes.RESPONSE_FOUND;
-                }
-            });
-
-            // Realiza a busca similar
-            message_object.contem_texto.forEach((message_object_item) => 
-            {
-                // Verifica se a mensagem enviada contém algum dos textos
-                if(messageBody.search(message_object_item) != -1)
-                {
-                    // Verifica o tipo da mensagem
-                    if(msg.hasMedia) {
-                        messageResponse = message_object.resposta_contem_img;
-                    } else if(msg.type === MessageTypes.LOCATION) {
-                        messageResponse = message_object.resposta_contem_loc;
-                    } else {
-                        messageResponse = message_object.resposta_contem_txt;
-                    }
-
-                    throw ReturnCodes.RESPONSE_FOUND;
-                }
-            });            
+            messageResponse = BuildSimilarTextResponse(messageBody, message_object, msg);
+            if(messageResponse.length > 0) 
+                throw ReturnCodes.RESPONSE_FOUND;
         });
     } catch(code)
     {
@@ -239,14 +279,14 @@ function BuildMessageResponse(messageBody, msg)
     // Verifica se uma resposta anterior já foi encontrada
     if(messageResponse.length == 0)
     {
-        var isPeriodResponse = BotConfig.GetSettings().robo.resposta_padrao.resposta_por_periodo_habilitada;
-        var value = BotConfig.GetSettings().robo.resposta_padrao.conteudo;
+        let isPeriodResponse = BotConfig.GetSettings().robo.resposta_padrao.resposta_por_periodo_habilitada;
+        let value = BotConfig.GetSettings().robo.resposta_padrao.conteudo;
 
         if(isPeriodResponse)
         {
             // Responde de acordo com a hora do dia
-            var dateObj = new Date(Date.now());
-            var hour;
+            let dateObj = new Date(Date.now());
+            let hour;
 
             hour = dateObj.getHours();
 
