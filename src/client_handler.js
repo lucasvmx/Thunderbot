@@ -29,6 +29,8 @@ var fs = require("fs");
 var Logger = new MessageLogger();
 var BotConfig = new BotSettings();
 
+var showOnlineStatus = false;
+
 /**
  * Tamanho do log (bytes)
  */
@@ -57,8 +59,10 @@ async function OnClientReady()
     BotConfig.Initialize();
 
     // Exibe o status online, se for configurado para isso
-    if(BotConfig.GetSettings().robo.exibir_status_online)
+    if(BotConfig.GetSettings().robo.exibir_status_online) {
         bot._client.sendPresenceAvailable();
+        showOnlineStatus = true;
+    }
 
     // Verifica se o log está ativado
     if(BotConfig.GetSettings().robo.log_de_mensagens.ativado)
@@ -82,6 +86,11 @@ async function OnClientReady()
  */
 async function OnMessageReceived(msg)
 {   
+    // De tempos em tempos, exibe que está online
+    if(showOnlineStatus)
+        bot._client.sendPresenceAvailable();
+
+    // Exibe a mensagem recebida
     HandleMessageReceived(msg);
 }
 
@@ -229,11 +238,11 @@ function BuildSimilarTextResponse(messageBody, message_object, msg)
             {   
                 // Verifica o tipo da mensagem
                 if(msg.hasMedia) {
-                    messageResponse = message_object.resposta_exato_img;
+                    messageResponse = message_object.resposta_contem_img;
                 } else if(msg.type === MessageTypes.LOCATION) {
-                    messageResponse = message_object.resposta_exato_loc;
+                    messageResponse = message_object.resposta_contem_loc;
                 } else {
-                    messageResponse = message_object.resposta_exato_txt;
+                    messageResponse = message_object.resposta_contem_txt;
                 }
             }
         }
