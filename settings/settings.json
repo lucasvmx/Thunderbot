@@ -5,7 +5,7 @@
         "responder_grupos": false,
         "log_de_mensagens": {
             "ativado": true,
-            "tam_maximo_log_bytes": 30
+            "tam_maximo_log_bytes": 65535
         },
         "mensagem":
         [
