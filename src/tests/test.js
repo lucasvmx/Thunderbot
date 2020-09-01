@@ -14,34 +14,22 @@
     limitations under the License.
 */
 
-const qrcode = require('qrcode-terminal');
+const bot = require("../bot_setup");
 
-/**
- * 
- * @param {*} qr 
- */
-this.generate_qr_code = function (qr)
+async function doTests()
 {
-    qrcode.generate(qr, {small: true});
-};
+    bot.setup();
+    bot.start();
 
-/**
- * 
- */
-this.on_client_ready = function()
-{
-    console.log("Cliente configurado");
-};
+    return 0;
+}
 
-/**
- * 
- * @param {*} msg 
- */
-this.on_message_received = function(msg)
-{
-    // Mensagens de grupo serão ignoradas
-    if(msg.getChat().isGroup === true) {
-        return;
-    }
-};
-
+// Realiza os testes
+doTests().then((passed) => {
+    console.log(`Passed: ${passed}`);
+    process.exit(0);
+}, (reason) => {
+    console.log(`Rejected: ${reason}`);
+    console.log(reason);
+    process.exit(1);
+});

@@ -1,2 +1,6 @@
 # Ignorar os módulos do node
 node_modules/*
+*.dat
+commit.txt
+sessions/*
+/tools/configurator/thunderconfig/target/

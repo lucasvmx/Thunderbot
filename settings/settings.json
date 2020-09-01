@@ -1,0 +1,36 @@
+{
+    "robo": 
+    {
+        "exibir_status_online": true,
+        "responder_grupos": false,
+        "log_de_mensagens": {
+            "ativado": true,
+            "tam_maximo_log_bytes": 65535
+        },
+        "mensagem":
+        [
+            {
+                "texto_exato": [ "", "", "" ],
+                "resposta_exato_txt": "",
+                "resposta_exato_img": "",
+                "resposta_exato_loc": "",
+                "contem_texto": [ "" ],
+                "resposta_contem_txt": "",
+                "resposta_contem_img": "",
+                "resposta_contem_loc": ""
+            }
+        ],
+        "resposta_padrao": 
+        {
+            "conteudo": "this is a test",
+            "resposta_por_periodo_habilitada": false,
+            "resposta_periodo": 
+            {
+                "manha": "/path/to/manha.txt",
+                "tarde": "/path/to/tarde.txt",
+                "noite": "/path/to/noite.txt",
+                "madrugada": "/path/to/madrugada.txt"
+            }          
+        }
+    }
+}
