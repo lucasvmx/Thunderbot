@@ -178,9 +178,10 @@ async function HandleMessageReceived(msg)
     // Obtém a resposta adequada
     response = BuildMessageResponse(body, msg);
 
-    // Responde ao contato
+    // Responde ao contato (apenas se isso tiver que ser feito)
     // msg.reply - reponde uma mensagem em específico
-    chat.sendMessage(response);
+    if(response.length > 0)
+        chat.sendMessage(response);
 }
 
 /**
@@ -291,6 +292,15 @@ function BuildMessageResponse(messageBody, msg)
         let isPeriodResponse = BotConfig.GetSettings().robo.resposta_padrao.resposta_por_periodo_habilitada;
         let value = BotConfig.GetSettings().robo.resposta_padrao.conteudo;
 
+        // O bot não deverá ignorar a mensagem
+        if(value == undefined) {
+            console.log(`Ignorando mensagem de ${msg.from}`);
+            return "";
+        } else if((typeof(value) == "string") && (value.length == 0)) {
+            console.log(`Ignorando mensagem de ${msg.from}`);
+            return ""; 
+        }
+        
         if(isPeriodResponse)
         {
             // Responde de acordo com a hora do dia
@@ -321,7 +331,9 @@ function BuildMessageResponse(messageBody, msg)
             if(fs.existsSync(value)) {
                 messageResponse = fs.readFileSync(value).toString();
             } else {
-                messageResponse = value;
+                if(value.length > 0) {
+                    messageResponse = value;
+                }
             }
         }
     }
