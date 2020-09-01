@@ -26,11 +26,11 @@
 <!-- MARKDOWN LINKS & IMAGES -->
 <!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
 
-[![Codefactor](https://www.codefactor.io/repository/github/lucas-engen/thunderbot/badge?s=aa5850e2172e4d9479a3243a7d881bc2b66774b7)](https://www.codefactor.io/repository/github/lucas-engen/thunderbot)
-
+[Codefactor]: https://www.codefactor.io/repository/github/lucas-engen/thunderbot/badge?s=aa5850e2172e4d9479a3243a7d881bc2b66774b7
 [nodeci-status]: https://github.com/lucas-engen/Thunderbot/workflows/Node.js%20CI/badge.svg
 
 ![ci-status][nodeci-status]
+![codefactor][Codefactor]
 
 <!-- PROJECT LOGO -->
 <br />
