@@ -119,9 +119,9 @@ Distributed under the Apache License. See `LICENSE` for more information.
 <!-- CONTACT -->
 ## Contact
 
-Lucas Vieira - [Instagram](https://www.instagram.com/__lucas.vmx) - [Gmail](mailto:lucas.engen.cc@gmail.com?subject=Sobre%20a%20libhack)
+Lucas Vieira - [Instagram](https://www.instagram.com/__lucas.vmx) - [Gmail](mailto:lucas.engen.cc@gmail.com?subject=Sobre%20o%20thunderbot)
 
-Project Link: [https://github.com/lucas-engen/libhack](https://github.com/lucas-engen/libhack)
+Project Link: [https://github.com/lucas-engen/Thunderbot](https://github.com/lucas-engen/Thunderbot)
 
 
 
