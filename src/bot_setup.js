@@ -58,10 +58,10 @@ function register_client_handlers()
     });
 
     client.on('disconnected', (state) => {
-
+        console.log(`Cliente desconectado: ${state}`);
     });
 
-    console.info("Cliente configurado com sucesso. Aguarde pelo QR code ...");
+    console.info("Cliente configurado com sucesso.");
 }
 
 /**
@@ -97,6 +97,9 @@ this.setup = async function()
     // Verifica se já existe uma seção salva
     if(filesystem.existsSync(Settings.SESSION_FILE))
     {
+        // Exibe mensagem de log
+        console.log("Recarregando sessão antiga ...");
+
         // Carrega a sessão antiga
         sessionData = require(`${process.cwd()}/${Settings.SESSION_FILE}`);
 

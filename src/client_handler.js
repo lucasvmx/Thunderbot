@@ -47,7 +47,9 @@ var logActivated = false;
  */
 async function GenerateQRCode(qr)
 {
-    qrcode.generate(qr, {small: true});
+    qrcode.generate(qr, {small: true}, function(qrcode) {
+        console.log(`QR Code:\n${qrcode}`);
+    });
 }
 
 /**
@@ -124,7 +126,8 @@ async function OnUserAuthenticated(Session)
 async function OnAuthFailed(message)
 {
     // Exibe a mensagem de erro
-    console.log(`A autenticação falhou: ${message}. Gerando QR code ...`);
+    console.log(`A autenticação falhou: ${message}.`);
+    console.log("Gerando QR code ...");
 
     // Deleta a sessão antiga
     fs.unlinkSync(Settings.SESSION_FILE);
@@ -237,14 +240,8 @@ function BuildSimilarTextResponse(messageBody, message_object, msg)
             // Realiza a busca exata
             if(messageBody === similar_text)
             {   
-                // Verifica o tipo da mensagem
-                if(msg.hasMedia) {
-                    messageResponse = message_object.resposta_contem_img;
-                } else if(msg.type === MessageTypes.LOCATION) {
-                    messageResponse = message_object.resposta_contem_loc;
-                } else {
-                    messageResponse = message_object.resposta_contem_txt;
-                }
+                // Devolve a resposta encontrada
+                messageResponse = message_object.resposta_contem_txt;
             }
         }
     });

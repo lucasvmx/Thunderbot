@@ -15,14 +15,12 @@
                 "resposta_exato_img": "",
                 "resposta_exato_loc": "",
                 "contem_texto": [ "" ],
-                "resposta_contem_txt": "",
-                "resposta_contem_img": "",
-                "resposta_contem_loc": ""
+                "resposta_contem_txt": ""
             }
         ],
         "resposta_padrao": 
         {
-            "conteudo": "this is a test",
+            "conteudo": "",
             "resposta_por_periodo_habilitada": false,
             "resposta_periodo": 
             {

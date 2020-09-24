@@ -26,7 +26,7 @@ class botSettings
     constructor() 
     {
         // Inicializa a variável interna
-        this.bot_settings_object = "";
+        this.bot_settings_object = require('../settings/settings.json');
     }
 
     GetSettings()
@@ -51,6 +51,7 @@ class botSettings
      */
     InstallWatcher()
     {
+        // Timeout para recarregar o arquivo em disco
         const timeout = 5000;
 
         // Inicializa o watcher
@@ -75,32 +76,11 @@ class botSettings
      */
     Load()
     {
-        // Declara a variável
-        var json_obj = '';
-        var old_obj = this.bot_settings_object;
+        // Deleta o módulo em cache
+        delete require.cache[require.resolve('../settings/settings.json')];
 
-        console.log("Carregando configurações ...");
-
-        // Verifica se o arquivo de configurações existe
-        if(!fs.existsSync(Settings.SETTINGS_FILE))
-        {
-            // Erro fatal
-            console.error(`Erro fatal: O arquivo de configurações não foi localizado: ${process.cwd()}/${Settings.SETTINGS_FILE}`);
-            process.exit(1);
-        }
-
-        // Abre o arquivo de configurações
-        var contents = fs.readFileSync(Settings.SETTINGS_FILE).toString();
-
-        // Retorna um objeto JSON
-        try {            
-            json_obj = JSON.parse(contents);
-        } catch(err) {
-            console.log(`Falha ao carregar configurações: ${err}`);
-            
-            // Em caso de erro, as configurações antigas devem continuar
-            return old_obj;
-        }
+        // Recarrega o módulo
+        var json_obj = require('../settings/settings.json');
 
         return json_obj;
     }
