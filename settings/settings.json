@@ -1,33 +1,35 @@
 {
-    "robo": 
+    "bot": 
     {
-        "exibir_status_online": true,
-        "responder_grupos": false,
-        "log_de_mensagens": {
-            "ativado": true,
-            "tam_maximo_log_bytes": 65535
+        "show_online_status": true,
+        "answer_groups": false,
+        "log_messages": {
+            "activated": true,
+            "maximum_logsize_bytes": 65535
         },
-        "mensagem":
-        [
-            {
-                "texto_exato": [ "", "", "" ],
-                "resposta_exato_txt": "",
-                "resposta_exato_img": "",
-                "resposta_exato_loc": "",
-                "contem_texto": [ "" ],
-                "resposta_contem_txt": ""
-            }
-        ],
-        "resposta_padrao": 
+        "events":
         {
-            "conteudo": "",
-            "resposta_por_periodo_habilitada": false,
-            "resposta_periodo": 
+            "on_message_received": 
+			[
+				{
+					"case_sensitivity": true,
+					"message_exact_text": [ "", "", "" ],
+					"answer_to_exact_text": "",
+					"message_contains_text": [ "", "", "" ],
+                    "answer_to_contains_text": ""
+				}
+            ]
+        },
+        "default_answer": 
+        {
+            "answer": "this is a test",
+            "answer_by_timeofday_enabled": false,
+            "answers": 
             {
-                "manha": "/path/to/manha.txt",
-                "tarde": "/path/to/tarde.txt",
-                "noite": "/path/to/noite.txt",
-                "madrugada": "/path/to/madrugada.txt"
+                "morning": "/path/to/morning.txt",
+                "afternoon": "/path/to/afternoon.txt",
+                "night": "/path/to/night.txt",
+                "dawn": "/path/to/dawn.txt"
             }          
         }
     }
