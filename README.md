@@ -42,7 +42,7 @@
   <h3 align="center">Thunderbot</h3>
 
   <p align="center">
-    Thunderbot is a dedicated, simple and low-cost whatsapp robot for small business
+    Thunderbot is a simple and generic automated whatsapp client
     <br />
     <a href="https://github.com/lucas-engen/Thunderbot"><strong>Explore docs »</strong></a>
     <br />
@@ -75,7 +75,7 @@
 <!-- ABOUT THE PROJECT -->
 ## About The Project
 
-It was designed to help small business to have an automatic response system for whatsapp
+It was developed for personal use. It can also be adapted so that small businesses can have a simple, automated and low-cost response system.
 
 ### Built With
 
@@ -129,5 +129,6 @@ Project Link: [https://github.com/lucas-engen/Thunderbot](https://github.com/luc
 ## Acknowledgements
 
 * To God for life
-* To my father Jenner Silva who introduced me to the world of computing
-* To my friend Jakeliny who helps me to test this application
+* Jenner Silva
+* Jakeliny Patricio
+* [Pedro S. Lopez](https://github.com/pedroslopez)
