@@ -22,7 +22,7 @@
         },
         "default_answer": 
         {
-            "answer": "this is a test",
+            "answer": "",
             "answer_by_timeofday_enabled": false,
             "answers": 
             {

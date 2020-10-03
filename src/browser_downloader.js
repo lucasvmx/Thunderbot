@@ -71,7 +71,7 @@ async function DownloadBrowser(revision_number)
         let start, end, speed = 0, progress = 0;
 
         // Baixa o browser
-        let browser = fetcher.download(revision_number, (downloaded, total) => {
+        fetcher.download(revision_number, (downloaded, total) => {
 
             // Pega o número de bytes transferido
             start = total - downloaded;
@@ -96,7 +96,7 @@ async function DownloadBrowser(revision_number)
         {
             // Para o spinner
             spinner.stop();
-
+            
             // Chama a função reject
             reject(error);
 

@@ -16,10 +16,10 @@
 
 require("log-timestamp");
 var fs = require("fs");
-const { Settings } = require('./constants');
+const { Settings } = require('./constants.js');
 
 /**
- * 
+ * Armazena as configurações do bot
  */
 class botSettings
 {

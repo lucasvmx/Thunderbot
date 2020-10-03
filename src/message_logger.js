@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-var consts = require('./constants');
+var consts = require('./constants.js');
 var fs = require("fs");
 const { Utils } = require('./utils');
 

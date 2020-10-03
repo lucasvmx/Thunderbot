@@ -38,10 +38,10 @@ async function Main()
     setup_process_handlers();
 
     // Realiza toda a configuração inicial do programa
-    await bot.setup();
-    
+    let client = await bot.setup();
+
     // Inicia o bot
-    await bot.start();
+    await bot.start(client);
 }
 
 // Executa as tarefas
