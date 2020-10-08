@@ -54,7 +54,12 @@ exports.ReturnCodes = {
     /**
      * Resposta encontrada
      */
-    RESPONSE_FOUND: 1
+    RESPONSE_FOUND: 1,
+
+    /** 
+     * Resposta não encontrada
+    */
+    RESPONSE_NOT_FOUND: 2
 };
 
 /**

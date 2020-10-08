@@ -14,22 +14,41 @@
     limitations under the License.
 */
 
-const bot = require("../bot_setup");
+const bot = require('../bot_setup.js');
+const fs = require("fs");
+
+async function test_SettingsJsonSyntax()
+{
+    var file = fs.readFileSync("settings/settings.json");
+
+    console.log("parsing JSON ...");
+    JSON.parse(file);
+}
+
+async function test_BotConfiguration()
+{
+    // Test bot configuration
+    let client = await bot.setup();
+    await bot.start(client);
+}
 
 async function doTests()
 {
-    bot.setup();
-    bot.start();
+    await test_SettingsJsonSyntax();
+    await test_BotConfiguration();
 
     return 0;
 }
 
-// Realiza os testes
-doTests().then((passed) => {
-    console.log(`Passed: ${passed}`);
+async function Main()
+{
+    await doTests();
+}
+
+Main().then(() => {
+    console.log(`passed!`);
     process.exit(0);
-}, (reason) => {
-    console.log(`Rejected: ${reason}`);
-    console.log(reason);
+}, (rejected) => {
+    console.log(`rejected: ${rejected}`);
     process.exit(1);
 });

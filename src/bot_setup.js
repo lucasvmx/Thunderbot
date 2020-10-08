@@ -15,16 +15,17 @@
 */
 
 const { Client } = require('whatsapp-web.js');
-const { Settings, Folders } = require("./constants");
+const { Settings, Folders } = require("./constants.js");
 const handler = require('./client_handler');
 const filesystem = require("fs");
-let path = require("path");
 const downloader = require('./browser_downloader');
-const puppeteer = require("puppeteer-core");
-let client;
 
-
-function register_client_handlers()
+/**
+ * Configura os callbacks
+ * 
+ * @param {import("whatsapp-web.js").Client} client 
+ */
+async function register_client_handlers(client)
 {
     // Chamada quando o usuário se autentica
     client.on('authenticated', (session) => {
@@ -58,20 +59,21 @@ function register_client_handlers()
     });
 
     client.on('disconnected', (state) => {
-
+        console.log(`Cliente desconectado: ${state}`);
     });
 
-    console.info("Cliente configurado com sucesso. Aguarde pelo QR code ...");
+    console.info("Cliente configurado com sucesso.");
 }
 
 /**
  * Realiza as configurações iniciais do programa
  */
-this.setup = async function()
+async function SetupClient()
 {
     let sessionData;
-    var puppeteer_options;
-    var browserVersion;
+    let puppeteer_options;
+    let browserVersion;
+    let client;
 
     console.info("Fazendo configurações iniciais ...");
 
@@ -89,7 +91,7 @@ this.setup = async function()
     } catch(error) 
     {
         console.error(error.toString().toLocaleLowerCase());
-        process.exit(0);
+        process.exit(1);
     }
 
     console.info("Navegador web configurado com sucesso");
@@ -97,6 +99,9 @@ this.setup = async function()
     // Verifica se já existe uma seção salva
     if(filesystem.existsSync(Settings.SESSION_FILE))
     {
+        // Exibe mensagem de log
+        console.log("Recarregando sessão antiga ...");
+
         // Carrega a sessão antiga
         sessionData = require(`${process.cwd()}/${Settings.SESSION_FILE}`);
 
@@ -106,7 +111,7 @@ this.setup = async function()
         } catch(error)
         {
             console.error("Falha ao inicializar cliente: " + error);
-            process.exit(0);
+            process.exit(1);
         }
     } else 
     {
@@ -115,7 +120,7 @@ this.setup = async function()
             client = new Client({restartOnAuthFail: true, puppeteer: puppeteer_options});
         } catch(error) {
             console.error("Falha ao inicializar cliente: " + error);
-            process.exit(0);
+            process.exit(1);
         }
     }
 
@@ -129,23 +134,37 @@ this.setup = async function()
     // Verifica se o configurações existe
     if(!filesystem.existsSync(`${Settings.SETTINGS_FILE}`)) {
         console.error("O arquivo de configurações não existe!");
-        process.exit(0);
+        process.exit(1);
     }
 
     console.info("Configurando o cliente de Whatsapp ...");
 
     // Registra os handlers para o cliente
-    register_client_handlers();
+    await register_client_handlers(client);
 
-    // Símbolos exportados
+    // Exporta o símbolo do cliente
     this._client = client;
-};
+
+    // Retorna a instância do cliente
+    return client;
+}
 
 /**
- * Inicializa o cliente
+ * Inicia o cliente
+ * @param {import("whatsapp-web.js").Client} client_handle 
  */
-this.start = async function()
+async function StartClient(client_handle)
 {
+    if(typeof(client_handle) === undefined) {
+        console.error(`parâmetro inválido: ${typeof(client_handle)}`);
+        process.exit(1);
+    }
+
+    console.info(`iniciando cliente ...`);
+
     // Inicializa o cliente
-    client.initialize();
-};
+    client_handle.initialize();
+}
+
+this.start = StartClient;
+this.setup = SetupClient;

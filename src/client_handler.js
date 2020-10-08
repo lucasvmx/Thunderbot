@@ -14,21 +14,22 @@
     limitations under the License.
 */
 
-
 require("log-timestamp");
 const qrcode = require("qrcode-terminal");
 const bot = require('./bot_setup');
-const { Settings, ReturnCodes } = require("./constants");
+const { Settings, ReturnCodes } = require("./constants.js");
 const { BotSettings } = require('./bot_settings');
 const { MessageTypes } = require("whatsapp-web.js/src/util/Constants");
 const { MessageLogger } = require('./message_logger');
 const { Utils } = require('./utils');
 var fs = require("fs");
 
-
 var Logger = new MessageLogger();
 var BotConfig = new BotSettings();
 
+/**
+ * Flag para saber se o status de 'online' deverá ser exibido
+ */
 var showOnlineStatus = false;
 
 /**
@@ -47,7 +48,9 @@ var logActivated = false;
  */
 async function GenerateQRCode(qr)
 {
-    qrcode.generate(qr, {small: true});
+    qrcode.generate(qr, {small: true}, function(qrcode) {
+        console.log(`QR Code:\n${qrcode}`);
+    });
 }
 
 /**
@@ -55,20 +58,23 @@ async function GenerateQRCode(qr)
  */
 async function OnClientReady()
 {
+    let settings;
+
     // Carrega as configurações
     BotConfig.Initialize();
+    settings = BotConfig.GetSettings();
 
     // Exibe o status online, se for configurado para isso
-    if(BotConfig.GetSettings().robo.exibir_status_online) {
+    if(settings.bot.show_online_status) {
         bot._client.sendPresenceAvailable();
         showOnlineStatus = true;
     }
 
     // Verifica se o log está ativado
-    if(BotConfig.GetSettings().robo.log_de_mensagens.ativado)
+    if(settings.bot.log_messages.activated)
     {
         console.info("O log de mensagens está ativado");
-        logSize = parseInt(BotConfig.GetSettings().robo.log_de_mensagens.tam_maximo_log_bytes, 10);
+        logSize = parseInt(settings.bot.log_messages.maximum_logsize_bytes, 10);
         logActivated = true;
         Logger = new MessageLogger(logSize);
         Logger.start_logger();
@@ -81,8 +87,8 @@ async function OnClientReady()
 }
 
 /**
- * 
- * @param {*} msg 
+ * Callback para lidar com as mensagens recebidas
+ * @param {import("whatsapp-web.js").Message} msg 
  */
 async function OnMessageReceived(msg)
 {   
@@ -96,7 +102,7 @@ async function OnMessageReceived(msg)
 
 /**
  * 
- * @param {*} state 
+ * @param {import("whatsapp-web.js").WAState} state 
  */
 async function OnClientStateChanged(state)
 {
@@ -124,7 +130,8 @@ async function OnUserAuthenticated(Session)
 async function OnAuthFailed(message)
 {
     // Exibe a mensagem de erro
-    console.log(`A autenticação falhou: ${message}. Gerando QR code ...`);
+    console.log(`A autenticação falhou: ${message}.`);
+    console.log("Gerando QR code ...");
 
     // Deleta a sessão antiga
     fs.unlinkSync(Settings.SESSION_FILE);
@@ -147,18 +154,19 @@ function saveSession(Session)
 /**
  * É chamada assim que o BOT recebe uma mensagem
  * 
- * @param {*} msg Objeto do tipo Message
+ * @param {import("whatsapp-web.js").Message} msg Objeto do tipo Message
  */
 async function HandleMessageReceived(msg)
 {
     let chat = await msg.getChat();
     let contact = await msg.getContact();
-    let profilePicUrl = await contact.getProfilePicUrl();
+    //let profilePicUrl = await contact.getProfilePicUrl();
     let body = String(msg.body).toLowerCase();
     let response = '';
+    let settings = BotConfig.GetSettings();
 
     // Verifica se as mensagens de grupo devem ser ignoradas
-    if((BotConfig.GetSettings().robo.responder_grupos == false) && (chat.isGroup)) {
+    if((settings.bot.answer_groups == false) && (chat.isGroup)) {
         return;
     }
 
@@ -168,7 +176,7 @@ async function HandleMessageReceived(msg)
             Logger.register_log(`${Utils.GetDateTimeFromUnixTimestamp(msg.timestamp)} - ${contact.pushname}@${contact.number}: ${msg.body}`);
         } else {
             console.error("O logger não foi inicializado corretamente");
-            process.exit(0);
+            process.exit(1);
         }
     }
 
@@ -185,154 +193,179 @@ async function HandleMessageReceived(msg)
 }
 
 /**
- * @brief Constrói uma resposta exata para o texto especificado
- * 
- * @param {string} messageBody Corpo da mensagem recebida
- * @param {Object} message_object Objeto da mensagem no JSON
- * @param {import("whatsapp-web.js").Message} msg Instância para a classe Message
+ * Constrói uma resposta de acordo com a hora do dia
+ *
+ * @returns {string} resposta de acordo com a hora do dia
  */
-function BuildExactTextResponse(messageBody, message_object, msg)
+function BuildResponseByTimeofday()
 {
-    let messageResponse = "";
+    let dateObj = new Date(Date.now());
+    let hour;
+    let settings = BotConfig.GetSettings();
+    let value = "";
 
-    message_object.texto_exato.forEach((exact_text) => 
+    // Obtém as horas
+    hour = dateObj.getHours();
+
+    // Verifica a hora do dia
+    if(((hour >= 6) && (hour <= 11))) 
     {
-        if(exact_text.length > 0)
-        {
-            // Realiza a busca exata
-            if(messageBody === exact_text)
-            {    
-                // Verifica o tipo da mensagem
-                if(msg.hasMedia) {
-                    messageResponse = message_object.resposta_exato_img;
-                } else if(msg.type === MessageTypes.LOCATION) {
-                    messageResponse = message_object.resposta_exato_loc;
-                } else {
-                    messageResponse = message_object.resposta_exato_txt;
-                }
-
-                return messageResponse;
-            }
-        }
-    });
+        value = settings.bot.default_answer.answers.morning;
+    } else if((hour >= 12) && (hour <= 17))
+    {
+        value = settings.bot.default_answer.answers.afternoon;
+    } else if((hour >= 18) && (hour <= 23))
+    {
+        value = settings.bot.default_answer.answers.night;
+    } else {
+        value = settings.bot.default_answer.answers.dawn;
+    }
     
-    return messageResponse;
+    return value;
 }
 
 /**
- * @brief Constrói uma resposta caso o texto similar seja encontrado
- * 
- * @param {string} messageBody Corpo da mensagem recebida
- * @param {Object} message_object Objeto da mensagem no JSON
- * @param {import("whatsapp-web.js").Message} msg Instância para a classe Message
+ * Verifica se a mensagem recebida deve ser ignorada
+ * @param {boolean} value 
  */
-function BuildSimilarTextResponse(messageBody, message_object, msg)
+function CanIgnoreMessage(value)
 {
-    let messageResponse = "";
+    let v = "";
 
-    message_object.contem_texto.forEach((similar_text) => 
-    {
-        if(similar_text.length > 0)
-        {
-            // Realiza a busca exata
-            if(messageBody === similar_text)
-            {   
-                // Verifica o tipo da mensagem
-                if(msg.hasMedia) {
-                    messageResponse = message_object.resposta_contem_img;
-                } else if(msg.type === MessageTypes.LOCATION) {
-                    messageResponse = message_object.resposta_contem_loc;
-                } else {
-                    messageResponse = message_object.resposta_contem_txt;
-                }
-            }
+    // Valores que não sejam do tipo string não serão considerados
+    if(typeof(value) != "string") {
+        return true;
+    } else {
+        v = value;
+        if(v.length == 0) {
+            return true;
         }
-    });
+    }
 
-    return messageResponse;
+    return false;
 }
 
  /**
   * Constrói uma resposta para a mensagem recebida e a retorna
   * 
   * @param {string} messageBody Corpo da mensagem recebida no chat
-  * @param {Message} msg Instância da classe Message
+  * @param {import("whatsapp-web.js").Message} msg Instância da classe Message
   */
 function BuildMessageResponse(messageBody, msg)
 {
     let messageResponse = "";
+    var settings = BotConfig.GetSettings();
 
     // Obtém a resposta adequada
-    try 
+    settings.bot.events.on_message_received.every(function(message_object)
     {
-        BotConfig.GetSettings().robo.mensagem.forEach((message_object) => {
-            
-            // Constrói as responstas. Uma exceção será lançada caso a resposta seja encontrada
-            messageResponse = BuildExactTextResponse(messageBody, message_object, msg);
-            if(messageResponse.length > 0) 
-                throw ReturnCodes.RESPONSE_FOUND;
+        let bCaseSensitive = message_object.case_sensitivity;
 
-            messageResponse = BuildSimilarTextResponse(messageBody, message_object, msg);
-            if(messageResponse.length > 0) 
-                throw ReturnCodes.RESPONSE_FOUND;
+        // Realiza uma busca pelo texto exato na lista de mensagens
+        message_object.message_exact_text.every(function(message) 
+        {
+            if(message.length > 0)
+            {
+                // Realiza a busca exata
+                let found = false;
+
+                if(bCaseSensitive) {
+                    found = (messageBody === message);
+                } else {
+                    found = ((messageBody.toLowerCase() == message.toLowerCase()));
+                }
+
+                if(found)
+                {    
+                    // Verifica o tipo da mensagem
+                    messageResponse = message_object.answer_to_exact_text;
+                    
+                    if(messageResponse.length > 0) {
+                        return false;
+                    }
+                }
+            }
+
+            return true;
         });
-    } catch(code)
-    {
-        if(code === ReturnCodes.RESPONSE_FOUND)
-        {                        
-            // Retorna a resposta (se ela não for vazia)
-            if(messageResponse.length > 0)
-                return messageResponse;
-        }
-    }
-
-    // Verifica se uma resposta anterior já foi encontrada
-    if(messageResponse.length == 0)
-    {
-        let isPeriodResponse = BotConfig.GetSettings().robo.resposta_padrao.resposta_por_periodo_habilitada;
-        let value = BotConfig.GetSettings().robo.resposta_padrao.conteudo;
-
-        // O bot não deverá ignorar a mensagem
-        if(value == undefined) {
-            console.log(`Ignorando mensagem de ${msg.from}`);
-            return "";
-        } else if((typeof(value) == "string") && (value.length == 0)) {
-            console.log(`Ignorando mensagem de ${msg.from}`);
-            return ""; 
-        }
         
+        // Se a resposta foi encontrada, o loop deve ser finalizado
+        if(messageResponse.length > 0)
+            return false;
+
+        return true;
+    });
+
+    // Se a resposta para o texto exato não for encontrada
+    if(messageResponse.length == 0) 
+    {
+        // Realiza uma busca pelo texto similar em cada mensagem
+        settings.bot.events.on_message_received.every(function(message_object)
+        {
+            let bCaseSensitive = message_object.case_sensitivity;
+
+            message_object.message_contains_text.every(function(message) 
+            {
+                if(message.length > 0)
+                {
+                    let found = false;
+
+                    if(bCaseSensitive) {
+                        found = (messageBody === message);
+                    } else {
+                        found = (messageBody.toLowerCase() == message.toLowerCase());
+                    }
+
+                    // Realiza a busca exata
+                    if(found)
+                    {
+                        // Devolve a resposta encontrada
+                        messageResponse = message_object.answer_to_contains_text;
+                    }
+
+                    if(messageResponse.length > 0) {
+                        return false;
+                    }
+                }
+            });
+
+            if(messageResponse.length > 0)
+                return false;
+
+            return true;
+        });
+    }
+  
+    // Retorna a resposta (se ela não for vazia)
+    if(messageResponse.length > 0) 
+    {
+        return messageResponse;
+    } else 
+    {
+        let isPeriodResponse = settings.bot.default_answer.answer_by_timeofday_enabled;
+        let default_answer = settings.bot.default_answer.answer;
+
+        // Configura a resposta padrão
+        messageResponse = default_answer;
+        
+        // Verifica se O bot deverá ignorar a mensagem
+        if(CanIgnoreMessage(default_answer)) {
+            console.log(`ignorando mensagem de ${msg.from} ...`);
+            return "";
+        }
+
         if(isPeriodResponse)
         {
-            // Responde de acordo com a hora do dia
-            let dateObj = new Date(Date.now());
-            let hour;
-
-            hour = dateObj.getHours();
-
             // Obtém o valor contido na chave da resposta padrão, porém de acordo com o turno do dia
-            if(((hour >= 6) && (hour <= 11))) 
-            {
-                value = BotConfig.GetSettings().robo.resposta_padrao.resposta_periodo.manha;
-            } else if((hour >= 12) && (hour <= 17))
-            {
-                value = BotConfig.GetSettings().robo.resposta_padrao.resposta_periodo.tarde;
-            } else if((hour >= 18) && (hour <= 23))
-            {
-                value = BotConfig.GetSettings().robo.resposta_padrao.resposta_periodo.noite;
-            } else {
-                value = BotConfig.GetSettings().robo.resposta_padrao.resposta_periodo.madrugada;
-            }      
-            
-            // Configura a resposta
-            messageResponse = value;
+            messageResponse = BuildResponseByTimeofday();      
         } else 
         {
             // É um arquivo existente em disco?
-            if(fs.existsSync(value)) {
-                messageResponse = fs.readFileSync(value).toString();
+            if(fs.existsSync(default_answer)) {
+                messageResponse = fs.readFileSync(default_answer).toString();
             } else {
-                if(value.length > 0) {
-                    messageResponse = value;
+                if(default_answer.length > 0) {
+                    messageResponse = default_answer;
                 }
             }
         }
@@ -341,6 +374,10 @@ function BuildMessageResponse(messageBody, msg)
     return messageResponse;
 }
 
+/**
+ * Callback chamado quando o cliente perde a conexão
+ * @param {import("whatsapp-web.js").WAState} state 
+ */
 async function OnClientDisconnected(state)
 {
     console.log("Perdemos a conexão! Motivo: " + state);
