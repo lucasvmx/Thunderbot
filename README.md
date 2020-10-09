@@ -28,7 +28,7 @@
 
 [Codefactor]: https://www.codefactor.io/repository/github/lucas-engen/thunderbot/badge?s=aa5850e2172e4d9479a3243a7d881bc2b66774b7
 [nodeci-status]: https://github.com/lucas-engen/Thunderbot/workflows/Node.js%20CI/badge.svg
-[release-ver]: https://img.shields.io/github/v/release/lucas-engen/thunderbot?color=orange&style=plastic
+[release-ver]: https://img.shields.io/github/v/release/lucas-engen/thunderbot?color=orange
 
 ![ci-status][nodeci-status]
 ![codefactor][Codefactor]
