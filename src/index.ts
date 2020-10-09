@@ -14,35 +14,30 @@
     limitations under the License.
 */
 
-var bot = require('./bot_setup');
+import BotSetup from './bot_setup';
 
 /**
- * Instala os handlers para o processo principal
+ * installs handlers to the main process
  */
-function setup_process_handlers()
+function setupProcessHandlers(): void
 {
-    // Handler para tratar a saída do programa
-    process.on('exit', (code) => 
+    // Handler to handle program output
+    process.on('exit', (code: number) => 
     {
         if(code != 0)
-            console.log("Algo deu errado. Reinicie o programa");
+            console.log("something was wrong. Please restart the program");
     });
 }
 
 /**
- * 
+ * main function
  */
-async function Main()
+async function main()
 {
-    // Configura os handlers para tratar os erros ocorridos no event loop
-    setup_process_handlers();
+    var bot: BotSetup = new BotSetup();
 
-    // Realiza toda a configuração inicial do programa
-    let client = await bot.setup();
-
-    // Inicia o bot
-    await bot.start(client);
+    // makes the initial setup
+    bot.setupClient();
 }
 
-// Executa as tarefas
-Main();
+main();

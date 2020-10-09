@@ -14,35 +14,35 @@
     limitations under the License.
 */
 
-const bot = require('../bot_setup.js');
-const fs = require("fs");
+import BotSetup from '../bot_setup';
+import fs from "fs";
 
-async function test_SettingsJsonSyntax()
+function test_SettingsJsonSyntax(): void
 {
     var file = fs.readFileSync("settings/settings.json");
 
     console.log("parsing JSON ...");
-    JSON.parse(file);
+    JSON.parse(file.toString());
 }
 
-async function test_BotConfiguration()
+function test_BotConfiguration()
 {
     // Test bot configuration
-    let client = await bot.setup();
-    await bot.start(client);
+    let bot: BotSetup = new BotSetup();
+    bot.setupClient();
 }
 
-async function doTests()
+function doTests()
 {
-    await test_SettingsJsonSyntax();
-    await test_BotConfiguration();
+    test_SettingsJsonSyntax();
+    test_BotConfiguration();
 
     return 0;
 }
 
 async function Main()
 {
-    await doTests();
+    doTests();
 }
 
 Main().then(() => {
