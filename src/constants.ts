@@ -14,79 +14,62 @@
     limitations under the License.
 */
 
+import { join } from "path";
+
 /**
- * Definições de pasta
+ * General constants
  */
-exports.Folders = {
-    
+class Constants
+{
     /**
      * Pasta contendo os dados da seção
      */
-    SESSION_FOLDER: 'sessions',
+    static SESSION_FOLDER: string = "sessions";
 
     /**
      * Pasta contendo as configurações
      */
-    SETTINGS_FOLDER: 'settings'
-};
-
-/**
- * Configurações
- */
-exports.Settings = {
+    static SETTINGS_FOLDER: string = 'settings';
 
     /**
      * Nome do arquivo que contém a sessão
      */
-    SESSION_FILE: `${this.Folders.SESSION_FOLDER}/thunderbot.json`,
+    static SESSION_FILE: string = join(process.cwd(), join(Constants.SESSION_FOLDER, "thunderbot.json"));
 
     /**
      * Nome do arquivo de configurações
      */
-    SETTINGS_FILE: `${this.Folders.SETTINGS_FOLDER}/settings.json`
-};
-
-/**
- * Códigos de retorno
- */
-exports.ReturnCodes = {
+    static SETTINGS_FILE: string = join(process.cwd(), join(Constants.SETTINGS_FOLDER, "settings.json"));
 
     /**
      * Resposta encontrada
      */
-    RESPONSE_FOUND: 1,
+    static RESPONSE_FOUND: number = 1;
 
     /** 
      * Resposta não encontrada
     */
-    RESPONSE_NOT_FOUND: 2
-};
-
-/**
- * Canais de desenvolvimento do browser (estável, dev, etc)
- */
-exports.BrowserChannels = {
+    static RESPONSE_NOT_FOUND: number = 2;
 
     /**
     * Canal estável
     */
-    STABLE_CHANNEL: "stable",
+    static STABLE_CHANNEL: string = "stable";
 
     /**
     * Canal de desenvolvimento
     */
-    DEV_CHANNEL: "dev",
+    static DEV_CHANNEL: string = "dev";
 
     /**
     * Canal 'canary'
     */  
-    CANARY_CHANNEL: "canary"
-};
-
-exports.FileOpenModes = {
+    static CANARY_CHANNEL: string = "canary";
 
     /**
-    * Abre o arquivo no modo de inserção (síncrono). O arquivo será criado, caso não exista
-    */
-    APPEND_SYNC: "as"
-};
+     * Open in async mode and to append data
+     */
+    static APPEND_SYNC: string = "as";
+}
+
+export default Constants;

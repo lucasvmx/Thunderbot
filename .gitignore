@@ -4,3 +4,5 @@ node_modules/*
 commit.txt
 sessions/*
 /tools/configurator/thunderconfig/target/
+build/
+*.zip

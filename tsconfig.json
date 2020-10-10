@@ -1,0 +1,10 @@
+{
+    "compilerOptions": {
+        "outDir": "build",
+        "target": "es2020",
+        "moduleResolution": "Node",
+        "module": "CommonJS"
+    },
+    "exclude": ["src/tests/test.ts", "bot_test" ],
+    "compileOnSave": true,
+}

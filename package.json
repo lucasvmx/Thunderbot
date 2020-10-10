@@ -2,11 +2,12 @@
   "name": "thunderbot",
   "version": "0.1.1",
   "description": "A simple and generic automated whatsapp client",
-  "main": "src/index.js",
-  "bin": "src/index.js",
+  "main": "build/index.js",
+  "bin": "build/index.js",
   "scripts": {
-    "test": "node src/tests/test.js",
-    "start": "node src/index.js",
+    "test": "sucrase-node src/tests/test.ts",
+    "start": "sucrase-node src/index.ts",
+    "build": "tsc --build tsconfig.json",
     "pack": "pkg ."
   },
   "pkg": {
@@ -15,7 +16,7 @@
     ],
     "targets": [
       "node14-win-x64",
-      "node12-win-x64"
+      "node14-linux-x64"
     ]
   },
   "repository": {
@@ -42,6 +43,12 @@
     "puppeteer-core": "^3.3.0",
     "qrcode-terminal": "^0.12.0",
     "run": "^1.4.0",
+    "sucrase": "^3.15.0",
+    "typescript": "^4.0.3",
     "whatsapp-web.js": "^1.8.2"
+  },
+  "devDependencies": {
+    "@types/cli-spinner": "^0.2.0",
+    "@types/puppeteer-core": "^2.0.0"
   }
 }
