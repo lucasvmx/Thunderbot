@@ -1,38 +1,10 @@
-<!--
-*** Thanks for checking out this README Template. If you have a suggestion that would
-*** make this better, please fork the libhack and create a pull request or simply open
-*** an issue with the tag "enhancement".
-*** Thanks again! Now go create something AMAZING! :D
-***
-***
-***
-*** To avoid retyping too much info. Do a search and replace for the following:
-*** lucas-engen, libhack, __lucas.vmx, lucas.engen.cc@gmail.com
--->
-
-
-
-
-
-<!-- PROJECT SHIELDS -->
-<!--
-*** I'm using markdown "reference style" links for readability.
-*** Reference links are enclosed in brackets [ ] instead of parentheses ( ).
-*** See the bottom of this document for the declaration of the reference variables
-*** for contributors-url, forks-url, etc. This is an optional, concise syntax you may use.
-*** https://www.markdownguide.org/basic-syntax/#reference-style-links
--->
-
-<!-- MARKDOWN LINKS & IMAGES -->
-<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
-
 [Codefactor]: https://www.codefactor.io/repository/github/lucas-engen/thunderbot/badge?s=aa5850e2172e4d9479a3243a7d881bc2b66774b7
 [nodeci-status]: https://github.com/lucas-engen/Thunderbot/workflows/Node.js%20CI/badge.svg
-[release-ver]: https://img.shields.io/github/v/release/lucas-engen/thunderbot?color=orange
+[release-ver]: https://img.shields.io/github/v/release/lucas-engen/thunderbot?color=blue
 
 ![ci-status][nodeci-status]
-![codefactor][Codefactor]
 ![release][release-ver]
+![codefactor][Codefactor]
 
 <!-- PROJECT LOGO -->
 <br />
@@ -66,6 +38,8 @@
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
 * [Usage](#usage)
+  * [Simple](#simple)
+  * [Advanced](#advanced)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [License](#license)
@@ -93,6 +67,7 @@ To get a local copy up and running follow these simple steps.
 ### Prerequisites
 
 * Microsoft Windows 8 or Later
+* Linux (tested only in Manjaro x64)
 * Internet Connection
 
 ### Installation
@@ -101,6 +76,33 @@ To get a local copy up and running follow these simple steps.
 
 <!-- USAGE EXAMPLES -->
 ## Usage
+
+### Simple
+  * Download binary files and just execute directly:
+  ```
+  https://github.com/lucas-engen/Thunderbot/releases/latest
+  ```
+
+### Advanced
+
+  - Clone the repository
+    ```sh
+    git clone https://github.com/lucas-engen/Thunderbot.git
+    ```
+  - Install dependencies
+    ```sh
+    npm install
+    ```
+
+  - Execute the program
+    ```sh
+    npm start
+    ```
+
+## Configuration [settings.json](settings/settings.json)
+Please read the [documentation](docs/BOT_SETTINGS.md) of settings.json.
+
+
 
 <!-- ROADMAP -->
 ## Roadmap
@@ -112,6 +114,9 @@ See the [open issues](https://github.com/lucas-engen/Thunderbot/issues) for a li
 <!-- CONTRIBUTING -->
 ## Contributing
 
+- Fork this repo
+- Make your changes
+- Create a pull request
 
 <!-- LICENSE -->
 ## License
