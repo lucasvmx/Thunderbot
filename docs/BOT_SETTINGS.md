@@ -44,46 +44,46 @@ This documentation explains how do you configure thunderbot to reply messages
 ```
 
 ## File location
-The [settings file file](../settings/settings.json) must be inside a folder called *settings* on the same path of thunderbot binary file.
+The [settings file](../settings/settings.json) must be inside a folder called *settings* on the same path of thunderbot binary file.
 
 ## Live loading
 The [settings](../settings/settings.json) file can be edited while thunderbot is running.
 
 ## Fields
 
-* bot
-  * show_online_status
-    * true  - the status 'online' must be visible to your contacts, false otherwise
+* **bot**
+  * **_show_online_status_**
+    * true if the status 'online' must be visible to your contacts, false otherwise
 
-  * answer_groups
-    * true - to repond group messages, false otherwise
+  * **_answer_groups_**
+    * true to repond group messages, false otherwise
   
-  * log_messages
-    * activated - true to save received messages in a file on disk, false otherwise
+  * **_log_messages_**
+    * **_activated_** - true to save received messages in a file on disk, false otherwise
     
-    * maximum_logsize_bytes - maximum size in bytes of each log file
+    * **_maximum_logsize_bytes_** - maximum size in bytes of each log file
 
-  * events
-    * on message received
-      * case_sensitivity - true if the content of messages must be threated exactly as it is, false otherwise
+  * **_events_**
+    * **_on message received_**
+      * **_case_sensitivity_** - true if the content of messages must be threated exactly as it is, false otherwise
 
-      * message_exact_text - array containing all message texts to be searched exactly
+      * **_message_exact_text_** - array containing all message texts to be searched exactly
 
-      * answer_to_exact_text - string containing a response when one of the previous message texts has been found on received
+      * **_answer_to_exact_text_** - string containing a response when one of the previous message texts has been found on received
 
-      * message_contains_text - array containing all texts to be searched on received message
+      * **_message_contains_text_** - array containing all texts to be searched on received message
 
-      * answer_to_contains_text - response to deliver when one of the previous texts was found on received message
+      * **_answer_to_contains_text_** - response to deliver when one of the previous texts was found on received message
   
-  * default_answer
-    * answer - default answer to be delivered when none of the previous configured messages is found in content of the received message
+  * **_default_answer_**
+    * **answer** - default answer to be delivered when none of the previous configured messages is found in content of the received message
 
-    * answer_by_timeofday_enabled - true if the response is sent according to the time of day
+    * **answer_by_timeofday_enabled** - true if the response is sent according to the time of day
 
-      * morning - string containing a path to file that contains the response or a string containing the response to be sent when it's morning
+      * **_morning_** - string containing a path to file that contains the response or a string containing the response to be sent when it's morning
 
-      * afternoon - string containing a path to file that contains the response or a string containing the response to be sent when it's afternoon
+      * **_afternoon_** - string containing a path to file that contains the response or a string containing the response to be sent when it's afternoon
 
-      * night - string containing a path to file that contains the response or a string containing the response to be sent when it's night
+      * **_night_** - string containing a path to file that contains the response or a string containing the response to be sent when it's night
 
-      * dawn - string containing a path to file that contains the response or a string containing the response to be sent when it's dawn
+      * **_dawn_** - string containing a path to file that contains the response or a string containing the response to be sent when it's dawn
