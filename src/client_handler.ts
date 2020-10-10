@@ -367,23 +367,28 @@ class ClientHandler
                     bCaseSensitive = message_object.case_sensitivity;
                 }
 
-                message_object.message_contains_text.every(function(message) 
+                message_object.message_contains_text.every(function(message: string) 
                 {
                     if(message.length > 0)
                     {
                         let found: boolean = false;
 
                         if(bCaseSensitive) {
-                            found = (messageBody === message);
+                            found = messageBody.indexOf(message) >= 0;
                         } else {
-                            found = (messageBody.toLowerCase() == message.toLowerCase());
+                            messageBody = messageBody.toLowerCase();
+                            found = messageBody.indexOf(message.toLowerCase()) >= 0;
                         }
 
                         // Performs the exact search
                         if(found)
                         {
                             // Returns the found answer
-                            messageResponse = message_object.answer_to_contains_text;
+                            if(typeof(message_object.answer_to_contains_text) == "undefined") {
+                                messageResponse = "";
+                            } else {
+                                messageResponse = message_object.answer_to_contains_text;
+                            }
                         }
 
                         if(messageResponse.length > 0) {
