@@ -14,7 +14,7 @@
     limitations under the License.
 */
 
-import * as puppeteer from "puppeteer-core";
+const puppeteer = import("puppeteer");
 import { Spinner } from "cli-spinner";
 import { BrowserFetcher } from "puppeteer-core";
 
@@ -36,7 +36,7 @@ class Browser
      */
     async getRevisionNumber()
     {   
-        let revision_number = 782078;
+        let revision_number = 800071;
 
         return new Promise((resolve, reject) => 
         {
@@ -47,19 +47,21 @@ class Browser
     /**
      * Download the Browser with the specified revision
      * 
-     * @param {*} revision_number Program revision number
+     * @param revision_number program revision number
+     * @returns Promise<string> full path of local browser executable
      */
-    async download(revision_number: number)
+    async download(revision_number: number): Promise<string>
     {
         return new Promise(async(resolve, reject) => 
         {
-            var fetcher: BrowserFetcher;
+            let fetcher: BrowserFetcher;
 
             // creates fetcher
             try {
-                fetcher = puppeteer.createBrowserFetcher({path: process.cwd()});
+                fetcher = (await puppeteer).createBrowserFetcher({path: process.cwd()});
             } catch(err) {
-                console.warn("failed to create browser fetcher: " + err);
+                console.error("failed to create browser fetcher: " + err);
+                process.exit(1);
             }
 
             // Try to get a list of local versions
@@ -95,7 +97,7 @@ class Browser
             spinner.start();
 
             // Download the browser
-            fetcher.download(revision_number.toString(), (downloaded, total) => {
+            await fetcher.download(revision_number.toString(), (downloaded, total) => {
 
                 // Get the number of bytes transferred
                 start = total - downloaded;
@@ -119,17 +121,17 @@ class Browser
             }).catch((error) => 
             {
                 spinner.stop();
-                
+
                 reject(error);
-
-            }).finally(() => 
-            {
-                let exePath;
-                spinner.stop();
-
-                // It is resolved at the end of the download and passes the path of the downloaded browser
-                resolve(exePath);
             });
+
+            // stops the spinner
+            spinner.stop();
+            spinner.clearLine(spinner.stream);
+            
+            let browserLocation = fetcher.revisionInfo(revision_number.toString()).executablePath;
+            
+            resolve(browserLocation);
         });
     }    
 }
