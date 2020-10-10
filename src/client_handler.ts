@@ -19,9 +19,9 @@ import BotSettings from './bot_settings';
 import MessageLogger from './message_logger';
 import Utils from './utils';
 import("log-timestamp");
-import qrcode from "qrcode-terminal";
-import { Client, Message, WAState } from "whatsapp-web.js";
+import { Chat, Client, ClientSession, Contact, Message, WAState } from "whatsapp-web.js";
 import * as fs from "fs";
+import * as qrcode from "qrcode-terminal";
 
 /**
  * class to handle whatsapp web client
@@ -36,8 +36,8 @@ class ClientHandler
     /**
      * settings of bot
      */
-    settings;
-    
+    static settings: any;
+
     /**
      * status needs to be showed?
      */
@@ -72,16 +72,22 @@ class ClientHandler
     {
         this.settingsInstance = new BotSettings();
         this.settingsInstance.initialize();
-        this.settings = this.settingsInstance.getSettings();
+        ClientHandler.settings = this.settingsInstance.getSettings();
         this.client = whatsappClient;
     }
 
     /**
      * called when QR code is generated
-     * @param {*} qr 
+     * 
+     * @param qr qr code data
      */
-    async generateQRCode(qr)
+    async generateQRCode(qr: string)
     {
+        if(typeof(qrcode) == "undefined") {
+            console.log("qrcode is undefined");
+            process.exit(1);
+        }
+
         qrcode.generate(qr, {small: true}, function(qrcode) {
             console.log(`QR Code:\n${qrcode}`);
         });
@@ -95,16 +101,16 @@ class ClientHandler
         return new Promise<void>((resolve, reject) => 
         {
             // show status
-            if(this.settings.bot.show_online_status) {
+            if(ClientHandler.settings.bot.show_online_status) {
                 this.client.sendPresenceAvailable();
                 this.showOnlineStatus = true;
             }
 
             // checks if log has been activated
-            if(this.settings.bot.log_messages.activated)
+            if(ClientHandler.settings.bot.log_messages.activated)
             {
                 console.info("message logging activated");
-                this.logSize = parseInt(this.settings.bot.log_messages.maximum_logsize_bytes, 10);
+                this.logSize = parseInt(ClientHandler.settings.bot.log_messages.maximum_logsize_bytes, 10);
                 this.logActivated = true;
                 this.logger = new MessageLogger(this.logSize);
                 this.logger.startLogger();
@@ -114,6 +120,7 @@ class ClientHandler
 
             // Avisa ao usuário que está pronto para receber mensagens
             console.log("loading completed. Waiting for messages ...");
+            resolve();
         });
     }
 
@@ -142,9 +149,9 @@ class ClientHandler
     /**
      * called when user is authenticated
      * 
-     * @param {any} Session 
+     * @param {ClientSession} Session handle to a saved session (if any)
      */
-    async onUserAuthenticated(Session: any)
+    async onUserAuthenticated(Session: ClientSession)
     {    
         // saves the session
         this.saveSession(Session);
@@ -168,9 +175,9 @@ class ClientHandler
     /**
      * saves a whatsapp session
      * 
-     * @param {object} Session session to be saved
+     * @param {ClientSession} Session session to be saved
      */
-    saveSession(Session)
+    private saveSession(Session: ClientSession)
     {
         fs.writeFile(Constants.SESSION_FILE, JSON.stringify(Session), (err) => {
             if(err) {
@@ -184,21 +191,38 @@ class ClientHandler
      * 
      * @param {Message} msg A message object
      */
-    async handleMessageReceived(msg: Message)
+    private async handleMessageReceived(msg: Message)
     {
-        let chat = await msg.getChat();
-        let contact = await msg.getContact();
-        let body = String(msg.body).toLowerCase();
+        let chat: Chat;
+        let contact: Contact;
+        let body: string = String(msg.body).toLowerCase();
         let response = '';
+        let settings = ClientHandler.settings;
+        let bAnswerGroups: boolean;
+
+        try {
+            chat = await msg.getChat();
+        } catch(err) {
+            console.error("failed to get chat instance: " + err);
+            return;
+        }
+
+        // get contact instance
+        contact = await chat.getContact();
+
+        if(typeof(settings.bot.answer_groups) == "undefined") {
+            console.warn("answer groups setting is undefined! Assuming false");
+            bAnswerGroups = false;
+        }
 
         // we need to ignore group messages?
-        if((this.settings.bot.answer_groups == false) && (chat.isGroup)) {
+        if((bAnswerGroups == false) && (chat.isGroup)) {
             return;
         }
 
         if(this.logActivated) 
         {
-            if(typeof(this.logger) != undefined) {
+            if(typeof(this.logger) != "undefined") {
                 this.logger.registerLog(`${Utils.getDateTimeFromTimestamp(msg.timestamp)} - ${contact.pushname}@${contact.number}: ${msg.body}`);
             } else {
                 console.error("logger was not started correctly");
@@ -222,26 +246,27 @@ class ClientHandler
      *
      * @returns {string} response
      */
-    buildResponseByTimeOfDay()
+    private buildResponseByTimeOfDay(): string
     {
         let dateObj = new Date(Date.now());
         let hour: number;
         let value: string = "";
+        let settings: any = ClientHandler.settings;
 
         // get hour
         hour = dateObj.getHours();
 
         if(((hour >= 6) && (hour <= 11))) 
         {
-            value = this.settings.bot.default_answer.answers.morning;
+            value = settings.bot.default_answer.answers.morning;
         } else if((hour >= 12) && (hour <= 17))
         {
-            value = this.settings.bot.default_answer.answers.afternoon;
+            value = settings.bot.default_answer.answers.afternoon;
         } else if((hour >= 18) && (hour <= 23))
         {
-            value = this.settings.bot.default_answer.answers.night;
+            value = settings.bot.default_answer.answers.night;
         } else {
-            value = this.settings.bot.default_answer.answers.dawn;
+            value = settings.bot.default_answer.answers.dawn;
         }
         
         return value;
@@ -249,9 +274,10 @@ class ClientHandler
 
     /**
      * Checks whether the received message should be ignored
-     * @param {*} value 
+     * 
+     * @param {string} value message text
      */
-    canIgnoreMessage(value: any)
+    private canIgnoreMessage(value: string)
     {
         let v = "";
 
@@ -274,22 +300,30 @@ class ClientHandler
      * @param {string} messageBody body of received message
      * @param {Message} msg handle to the Message
      */
-    buildMessageResponse(messageBody, msg)
+    private buildMessageResponse(messageBody: string, msg: Message)
     {
-        let messageResponse = "";
+        let messageResponse:string = "";
+        let settings = ClientHandler.settings;
 
         // Get the right answer
-        this.settings.bot.events.on_message_received.every(function(message_object)
+        settings.bot.events.on_message_received.every(function(message_object)
         {
-            let bCaseSensitive = message_object.case_sensitivity;
+            let bCaseSensitive: boolean;
+
+            if(typeof(message_object.case_sensitivity) == "undefined") {
+                console.error("warn: case sensitivity could not be extracted");
+                bCaseSensitive = false;
+            } else {
+                bCaseSensitive = message_object.case_sensitivity;
+            }
 
             // performs a search for the exact text in the message list
-            message_object.message_exact_text.every(function(message) 
+            message_object.message_exact_text.every(function(message: string) 
             {
                 if(message.length > 0)
                 {
                     // Performs the exact search
-                    let found = false;
+                    let found: boolean = false;
 
                     if(bCaseSensitive) {
                         found = (messageBody === message);
@@ -298,7 +332,7 @@ class ClientHandler
                     }
 
                     if(found)
-                    {    
+                    {
                         // Checks the message type
                         messageResponse = message_object.answer_to_exact_text;
                         
@@ -322,15 +356,22 @@ class ClientHandler
         if(messageResponse.length == 0) 
         {
             // Performs a search for similar text in each message
-            this.settings.bot.events.on_message_received.every(function(message_object)
+            ClientHandler.settings.bot.events.on_message_received.every(function(message_object)
             {
-                let bCaseSensitive = message_object.case_sensitivity;
+                let bCaseSensitive: boolean;
+
+                if(typeof(message_object.case_sensitivity) == "undefined") {
+                    console.error("warn: case sensitivity could not be extracted");
+                    bCaseSensitive = false;
+                } else {
+                    bCaseSensitive = message_object.case_sensitivity;
+                }
 
                 message_object.message_contains_text.every(function(message) 
                 {
                     if(message.length > 0)
                     {
-                        let found = false;
+                        let found: boolean = false;
 
                         if(bCaseSensitive) {
                             found = (messageBody === message);
@@ -364,8 +405,8 @@ class ClientHandler
             return messageResponse;
         } else 
         {
-            let isPeriodResponse = this.settings.bot.default_answer.answer_by_timeofday_enabled;
-            let default_answer = this.settings.bot.default_answer.answer;
+            let isPeriodResponse = ClientHandler.settings.bot.default_answer.answer_by_timeofday_enabled;
+            let default_answer: string = ClientHandler.settings.bot.default_answer.answer;
 
             // Sets the default response
             messageResponse = default_answer;

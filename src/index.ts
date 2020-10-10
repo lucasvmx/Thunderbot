@@ -26,6 +26,14 @@ function setupProcessHandlers(): void
     {
         if(code != 0)
             console.log("something was wrong. Please restart the program");
+        else
+            console.info("bot finished");
+    });
+
+    process.on('unhandledRejection', (reason: {}, promise: Promise<any>) => {
+        console.error("we have a unhandled rejection: " + reason);
+        console.error("promise: " + promise);
+        process.exit(1);
     });
 }
 
@@ -35,6 +43,8 @@ function setupProcessHandlers(): void
 async function main()
 {
     var bot: BotSetup = new BotSetup();
+
+    setupProcessHandlers();
 
     // makes the initial setup
     bot.setupClient();

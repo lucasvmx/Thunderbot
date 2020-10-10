@@ -14,6 +14,8 @@
     limitations under the License.
 */
 
+import { join } from "path";
+
 /**
  * General constants
  */
@@ -32,12 +34,12 @@ class Constants
     /**
      * Nome do arquivo que contém a sessão
      */
-    static SESSION_FILE: string = `${Constants.SESSION_FOLDER}/thunderbot.json`;
+    static SESSION_FILE: string = join(process.cwd(), join(Constants.SESSION_FOLDER, "thunderbot.json"));
 
     /**
      * Nome do arquivo de configurações
      */
-    static SETTINGS_FILE: string = `${Constants.SETTINGS_FOLDER}/settings.json`
+    static SETTINGS_FILE: string = join(process.cwd(), join(Constants.SETTINGS_FOLDER, "settings.json"));
 
     /**
      * Resposta encontrada

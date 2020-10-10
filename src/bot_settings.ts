@@ -17,6 +17,8 @@
 import Constants from "./constants";
 import "log-timestamp";
 import * as fs from "fs";
+import * as path from "path";
+import ClientHandler from './client_handler';
 
 /**
  * class to handle bot settings (functions and methods)
@@ -26,25 +28,37 @@ class BotSettings
     /**
      * settings in JSON format
      */
-    bot_settings_object: any;
+    botSettingsObject: any;
+
+    /**
+     *path to settings file
+     *
+     * @type {string}
+     * @memberof BotSettings
+     */
+    botSettingsFilePath: string;
 
     constructor() 
     {
-        this.bot_settings_object = require('../settings/settings.json');
-    }
-
-    getSettings()
-    {
-        return this.bot_settings_object;
+        this.botSettingsFilePath = path.join(process.cwd(), "settings/settings.json");
+        console.info(`loading settings file: ${this.botSettingsFilePath}`);
     }
 
     /**
-     * initializes the program settings
+     * gets the current bot settings
+     */
+    getSettings(): any
+    {
+        return this.botSettingsObject;
+    }
+
+    /**
+     * initializes the program settings and install a filesystem watcher to monitor settings files
      */
     initialize()
     {
         // load settings from disk
-        this.bot_settings_object = this.load();
+        this.botSettingsObject = this.load();
 
         // install watcher
         this.installWatcher();
@@ -64,8 +78,9 @@ class BotSettings
             if(eventType === 'change')
             {
                 // reload settings information
-                setTimeout(function() {
-                    this.bot_settings_object = this.load();
+                setTimeout(() => {
+                    this.botSettingsObject = this.load();
+                    ClientHandler.settings = this.botSettingsObject;
                 }, timeout);
             } 
             else if(eventType == 'rename')
@@ -81,15 +96,20 @@ class BotSettings
     /**
      * load bot settings
      */
-    private load()
+    private load(): any
     {
-        // deletes cached module
-        delete require.cache[require.resolve('../settings/settings.json')];
+        // read settings file
+        let json_obj = fs.readFileSync(this.botSettingsFilePath);
+        let json: any;
 
-        // reloads the module
-        var json_obj = require('../settings/settings.json');
+        try {
+            json = JSON.parse(json_obj.toString());
+        } catch(err) {
+            console.error("failed to parse json: " + err);
+            process.exit(1);
+        }
 
-        return json_obj;
+        return json;
     }
 }
 
