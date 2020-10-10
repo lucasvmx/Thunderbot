@@ -112,10 +112,12 @@ class BotSetup
             // gets the browser version
             browserVersion = await this.browser.getRevisionNumber();
 
-            this.browser.download(browserVersion).then(function(value: string) 
+            console.info("browser version: " + browserVersion);
+
+            await this.browser.download(browserVersion).then(function(path: string) 
             {
                 // configures browser path
-                puppeteer_options = { executablePath: value };
+                puppeteer_options = { executablePath: path };
             }).catch((reason) => {
                 console.error(`failed to download browser: ${reason}`);
                 process.exit(1);
@@ -128,13 +130,20 @@ class BotSetup
 
         console.info("web browser configured successfully");
 
+        if(typeof(puppeteer_options) == "undefined") {
+            console.error("puppeteer options are undefined");
+            process.exit(1);
+        }
+        
+        console.info("browser location: " + puppeteer_options.executablePath);
+
         // Checks if a saved session already exists
         if(filesystem.existsSync(Constants.SESSION_FILE))
         {
             console.log("loading previous session ...");
 
             // load previous session
-            sessionData = require(`${process.cwd()}/${Constants.SESSION_FILE}`);
+            sessionData = require(Constants.SESSION_FILE);
 
             // initializes the client
             try {
