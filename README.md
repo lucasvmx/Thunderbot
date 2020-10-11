@@ -34,12 +34,14 @@
 
 * [About the Project](#about-the-project)
   * [Built With](#built-with)
+* [Demo](#demo)
 * [Getting Started](#getting-started)
   * [Prerequisites](#prerequisites)
   * [Installation](#installation)
 * [Usage](#usage)
   * [Simple](#simple)
   * [Advanced](#advanced)
+* [Configuration](#configuration)
 * [Roadmap](#roadmap)
 * [Contributing](#contributing)
 * [License](#license)
@@ -52,6 +54,9 @@
 ## About The Project
 
 It was developed for personal use. It can also be adapted so that small businesses can have a simple, automated and low-cost response system.
+
+### Demo
+![gif](images/demo.gif)
 
 ### Built With
 
@@ -99,7 +104,7 @@ To get a local copy up and running follow these simple steps.
     npm start
     ```
 
-## Configuration [settings.json](settings/settings.json)
+## Configuration
 Please read the [documentation](docs/BOT_SETTINGS.md) of settings.json.
 
 
