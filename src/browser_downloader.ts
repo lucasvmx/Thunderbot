@@ -35,10 +35,10 @@ class Browser
      * Gets the latest Browser revision number for the platform
      */
     async getRevisionNumber()
-    {   
+    {
         let revision_number = 800071;
 
-        return new Promise((resolve, reject) => 
+        return new Promise((resolve) =>
         {
             resolve(revision_number);
         });
@@ -46,13 +46,13 @@ class Browser
 
     /**
      * Download the Browser with the specified revision
-     * 
+     *
      * @param revision_number program revision number
      * @returns Promise<string> full path of local browser executable
      */
     async download(revision_number: number): Promise<string>
     {
-        return new Promise(async(resolve, reject) => 
+        return new Promise(async(resolve, reject) =>
         {
             let fetcher: BrowserFetcher;
 
@@ -78,7 +78,7 @@ class Browser
             }
 
             // Checks whether it is possible to download the specified version
-            if(!fetcher.canDownload(revision_number.toString())) 
+            if(!fetcher.canDownload(revision_number.toString()))
             {
                 reject(`version ${revision_number} couldn't be downloaded`);
                 return;
@@ -106,11 +106,14 @@ class Browser
                 setTimeout(()=> {
                     end = total - downloaded;
                     speed = ((end - start) / 1024.0);
-                    
-                    if((end == start) && (progress < 100))
+
+                    if((end == start) && (progress < 100)){
                         spinner.setSpinnerTitle("waiting for network connection");
-                    else if((end == start) && (progress == 100))
+                    }
+                    else if((end == start) && (progress == 100)) {
                         spinner.setSpinnerTitle("finishing download ...");
+                    }
+
                 }, 1000);
 
                 // Calculates progress
@@ -118,7 +121,7 @@ class Browser
 
                 // Updates progress
                 spinner.setSpinnerTitle(`downloading ------- ${progress.toFixed(2)}% ${speed.toFixed(2)} KB/s`);
-            }).catch((error) => 
+            }).catch((error) =>
             {
                 spinner.stop();
 
@@ -128,12 +131,12 @@ class Browser
             // stops the spinner
             spinner.stop();
             spinner.clearLine(spinner.stream);
-            
+
             let browserLocation = fetcher.revisionInfo(revision_number.toString()).executablePath;
-            
+
             resolve(browserLocation);
         });
-    }    
+    }
 }
 
 export default Browser;

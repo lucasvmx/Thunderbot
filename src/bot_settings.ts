@@ -38,7 +38,7 @@ class BotSettings
      */
     botSettingsFilePath: string;
 
-    constructor() 
+    constructor()
     {
         this.botSettingsFilePath = path.join(process.cwd(), "settings/settings.json");
         console.info(`loading settings file: ${this.botSettingsFilePath}`);
@@ -73,7 +73,7 @@ class BotSettings
         const timeout = 5000;
 
         // initialize the fs watcher
-        fs.watch(Constants.SETTINGS_FILE, (eventType: string) => 
+        fs.watch(Constants.SETTINGS_FILE, (eventType: string) =>
         {
             if(eventType === 'change')
             {
@@ -82,11 +82,11 @@ class BotSettings
                     this.botSettingsObject = this.load();
                     ClientHandler.settings = this.botSettingsObject;
                 }, timeout);
-            } 
+            }
             else if(eventType == 'rename')
             {
                 process.emitWarning("the settings file was renamed!!!");
-                
+
                 // this is a critical error
                 process.exit(1);
             }

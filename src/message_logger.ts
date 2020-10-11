@@ -27,7 +27,7 @@ function generateLogFilename()
     return LOG_FILENAME;
 }
 
-class MessageLogger 
+class MessageLogger
 {
     /**
      * name of the logfile
@@ -46,7 +46,7 @@ class MessageLogger
 
     /**
      * Creates a new instance of messageLogger
-     * 
+     *
      * @param maxFileSize max number of bytes per log file
      */
     constructor(maxFileSize: number)
@@ -66,8 +66,8 @@ class MessageLogger
 
     /**
      * register a new log on file
-     * 
-     * @param message message to be registered 
+     *
+     * @param message message to be registered
      */
     registerLog(message: string): void
     {
@@ -79,11 +79,11 @@ class MessageLogger
         let stat = fs.statSync(this.logFilename);
 
         // checks if maximum size was reached
-        if(stat.size > this.maxSizeBytes) 
+        if(stat.size > this.maxSizeBytes)
         {
             // closes current file and open another
             fs.closeSync(this.fd);
-            
+
             // generates a new filename
             this.logFilename = generateLogFilename();
 

@@ -65,7 +65,7 @@ class ClientHandler
 
     /**
      * Initializes the client
-     * 
+     *
      * @param whatsappClient handle to a initialized whatsapp client
      */
     constructor(whatsappClient: Client)
@@ -78,7 +78,7 @@ class ClientHandler
 
     /**
      * called when QR code is generated
-     * 
+     *
      * @param qr qr code data
      */
     async generateQRCode(qr: string)
@@ -98,7 +98,7 @@ class ClientHandler
      */
     async onClientReady(): Promise<void>
     {
-        return new Promise<void>((resolve, reject) => 
+        return new Promise<void>((resolve, reject) =>
         {
             // show status
             if(ClientHandler.settings.bot.show_online_status) {
@@ -126,7 +126,7 @@ class ClientHandler
 
     /**
      * called when a message is received
-     * @param {Message} msg 
+     * @param {Message} msg
      */
     async onMessageReceived(msg: Message)
     {
@@ -136,30 +136,30 @@ class ClientHandler
 
     /**
      * called when client state changes
-     * @param {WAState} state 
+     * @param {WAState} state
      */
     async onClientStateChanged(state: WAState)
     {
         if(state === "TIMEOUT") {
             console.log("timeout detected");
             process.exit(0);
-        }  
+        }
     }
 
     /**
      * called when user is authenticated
-     * 
+     *
      * @param {ClientSession} Session handle to a saved session (if any)
      */
     async onUserAuthenticated(Session: ClientSession)
-    {    
+    {
         // saves the session
         this.saveSession(Session);
     }
 
     /**
      * called when authentication fails
-     * 
+     *
      * @param {string} message error message
      */
     async onAuthFailed(message: string)
@@ -174,7 +174,7 @@ class ClientHandler
 
     /**
      * saves a whatsapp session
-     * 
+     *
      * @param {ClientSession} Session session to be saved
      */
     private saveSession(Session: ClientSession)
@@ -188,7 +188,7 @@ class ClientHandler
 
     /**
      * called when bot receives a message
-     * 
+     *
      * @param {Message} msg A message object
      */
     private async handleMessageReceived(msg: Message)
@@ -220,7 +220,7 @@ class ClientHandler
             return;
         }
 
-        if(this.logActivated) 
+        if(this.logActivated)
         {
             if(typeof(this.logger) != "undefined") {
                 this.logger.registerLog(`${Utils.getDateTimeFromTimestamp(msg.timestamp)} - ${contact.pushname}@${contact.number}: ${msg.body}`);
@@ -237,8 +237,9 @@ class ClientHandler
         response = this.buildMessageResponse(body, msg);
 
         // reply message (if needed)
-        if(response.length > 0)
+        if(response.length > 0) {
             chat.sendMessage(response);
+        }
     }
 
     /**
@@ -256,7 +257,7 @@ class ClientHandler
         // get hour
         hour = dateObj.getHours();
 
-        if(((hour >= 6) && (hour <= 11))) 
+        if(((hour >= 6) && (hour <= 11)))
         {
             value = settings.bot.default_answer.answers.morning;
         } else if((hour >= 12) && (hour <= 17))
@@ -268,13 +269,13 @@ class ClientHandler
         } else {
             value = settings.bot.default_answer.answers.dawn;
         }
-        
+
         return value;
     }
 
     /**
      * Checks whether the received message should be ignored
-     * 
+     *
      * @param {string} value message text
      */
     private canIgnoreMessage(value: string)
@@ -296,7 +297,7 @@ class ClientHandler
 
     /**
      * Constructs a response to the received message and returns it
-     * 
+     *
      * @param {string} messageBody body of received message
      * @param {Message} msg handle to the Message
      */
@@ -318,7 +319,7 @@ class ClientHandler
             }
 
             // performs a search for the exact text in the message list
-            message_object.message_exact_text.every(function(message: string) 
+            message_object.message_exact_text.every(function(message: string)
             {
                 if(message.length > 0)
                 {
@@ -335,7 +336,7 @@ class ClientHandler
                     {
                         // Checks the message type
                         messageResponse = message_object.answer_to_exact_text;
-                        
+
                         if(messageResponse.length > 0) {
                             return false;
                         }
@@ -344,16 +345,17 @@ class ClientHandler
 
                 return true;
             });
-            
+
             // If the answer was found, the loop must be terminated
-            if(messageResponse.length > 0)
+            if(messageResponse.length > 0) {
                 return false;
+            }
 
             return true;
         });
 
         // If the answer to the exact text is not found
-        if(messageResponse.length == 0) 
+        if(messageResponse.length == 0)
         {
             // Performs a search for similar text in each message
             ClientHandler.settings.bot.events.on_message_received.every(function(message_object)
@@ -367,7 +369,7 @@ class ClientHandler
                     bCaseSensitive = message_object.case_sensitivity;
                 }
 
-                message_object.message_contains_text.every(function(message: string) 
+                message_object.message_contains_text.every(function(message: string)
                 {
                     if(message.length > 0)
                     {
@@ -397,25 +399,26 @@ class ClientHandler
                     }
                 });
 
-                if(messageResponse.length > 0)
+                if(messageResponse.length > 0) {
                     return false;
+                }
 
                 return true;
             });
         }
-    
+
         // Returns the answer (if it is not empty)
-        if(messageResponse.length > 0) 
+        if(messageResponse.length > 0)
         {
             return messageResponse;
-        } else 
+        } else
         {
             let isPeriodResponse = ClientHandler.settings.bot.default_answer.answer_by_timeofday_enabled;
             let default_answer: string = ClientHandler.settings.bot.default_answer.answer;
 
             // Sets the default response
             messageResponse = default_answer;
-            
+
             // Checks whether the bot should ignore the message
             if(this.canIgnoreMessage(default_answer)) {
                 console.log(`ignoring message from: ${msg.from}`);
@@ -426,7 +429,7 @@ class ClientHandler
             {
                 // Gets the value contained in the standard response key, but according to time of day
                 messageResponse = this.buildResponseByTimeOfDay();
-            } else 
+            } else
             {
                 // the file exists?
                 if(fs.existsSync(default_answer)) {
@@ -444,7 +447,7 @@ class ClientHandler
 
     /**
      * called when client is disconnected
-     * 
+     *
      * @param {WAState} state whatsapp state
      */
     async onClientDisconnected(state: WAState)

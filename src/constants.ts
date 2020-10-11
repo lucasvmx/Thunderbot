@@ -46,7 +46,7 @@ class Constants
      */
     static RESPONSE_FOUND: number = 1;
 
-    /** 
+    /**
      * Resposta não encontrada
     */
     static RESPONSE_NOT_FOUND: number = 2;
@@ -63,7 +63,7 @@ class Constants
 
     /**
     * Canal 'canary'
-    */  
+    */
     static CANARY_CHANNEL: string = "canary";
 
     /**

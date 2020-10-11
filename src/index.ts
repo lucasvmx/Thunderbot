@@ -22,12 +22,14 @@ import BotSetup from './bot_setup';
 function setupProcessHandlers(): void
 {
     // Handler to handle program output
-    process.on('exit', (code: number) => 
+    process.on('exit', (code: number) =>
     {
-        if(code != 0)
+        if(code != 0) {
             console.log("something was wrong. Please restart the program");
-        else
+        }
+        else {
             console.info("bot finished");
+        }
     });
 
     process.on('unhandledRejection', (reason: {}, promise: Promise<any>) => {

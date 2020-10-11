@@ -21,7 +21,7 @@ class Utils
 {
     /**
      * gets a datetime string in a proper format to be used while generating filenames
-     * 
+     *
      * @returns string full string containing date and time
      */
     static getFullDateTime() : string
@@ -36,14 +36,14 @@ class Utils
         minute = ("0" + dt.getMinutes()).substr(-2);
         second = ("0" + dt.getSeconds()).substr(-2);
         ms = dt.getMilliseconds().toString().substr(-2);
-        
+
         return `${day}${month}${year}_${hour}${minute}${second}${ms}`;
     }
 
     /**
      * uses a unix timestamp to build a datetime string
-     * 
-     * @param unix_timestamp 
+     *
+     * @param unix_timestamp
      * @returns string full string containing date and time
      */
     static getDateTimeFromTimestamp(unix_timestamp: number): string
@@ -58,10 +58,9 @@ class Utils
         minute = ("0" + dt.getMinutes()).substr(-2);
         second = ("0" + dt.getSeconds()).substr(-2);
         ms = dt.getMilliseconds().toString().substr(-2);
-        
+
         return `${day}${month}${year}_${hour}${minute}${second}${ms}`;
     }
 }
 
 export default Utils;
-
