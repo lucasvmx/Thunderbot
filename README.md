@@ -126,7 +126,7 @@ See the [open issues](https://github.com/lucas-engen/Thunderbot/issues) for a li
 <!-- LICENSE -->
 ## License
 
-Distributed under the Apache License. See `LICENSE` for more information.
+Distributed under the GPLv3. See [LICENSE](LICENSE) for more information.
 
 <!-- CONTACT -->
 ## Contact
