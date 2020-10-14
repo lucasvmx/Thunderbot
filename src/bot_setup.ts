@@ -21,7 +21,7 @@ import * as filesystem from "fs";
 import Browser from './browser_downloader';
 
 /**
- * 
+ *
  */
 class BotSetup
 {
@@ -50,7 +50,7 @@ class BotSetup
 
     /**
      * configures the client handlers
-     * 
+     *
      */
     private registerClientHandlers(): void
     {
@@ -66,12 +66,12 @@ class BotSetup
         this.client.on('qr', (qr) => {
             this.handler.generateQRCode(qr);
         });
-        
+
         // called when client is ready to handle incoming messages
         this.client.on('ready', () => {
             this.handler.onClientReady();
         });
-        
+
         // called when a message is received
         this.client.on('message', (message) => {
             this.handler.onMessageReceived(message);
@@ -107,14 +107,14 @@ class BotSetup
 
         console.info("configuring client ...");
 
-        try 
+        try
         {
             // gets the browser version
             browserVersion = await this.browser.getRevisionNumber();
 
             console.info("browser version: " + browserVersion);
 
-            await this.browser.download(browserVersion).then(function(path: string) 
+            await this.browser.download(browserVersion).then(function(path: string)
             {
                 // configures browser path
                 puppeteer_options = { executablePath: path };
@@ -122,7 +122,7 @@ class BotSetup
                 console.error(`failed to download browser: ${reason}`);
                 process.exit(1);
             });
-        } catch(error) 
+        } catch(error)
         {
             console.error(error.toString().toLocaleLowerCase());
             process.exit(1);
@@ -134,7 +134,7 @@ class BotSetup
             console.error("puppeteer options are undefined");
             process.exit(1);
         }
-        
+
         console.info("browser location: " + puppeteer_options.executablePath);
 
         // Checks if a saved session already exists
@@ -153,7 +153,7 @@ class BotSetup
                 console.error("failed to initialize client: " + error);
                 process.exit(1);
             }
-        } else 
+        } else
         {
             // initializes the client
             try {
@@ -167,12 +167,14 @@ class BotSetup
         console.info("client initialized");
 
         // creates necessary folders
-        if(!filesystem.existsSync(Constants.SESSION_FOLDER))
+        if(!filesystem.existsSync(Constants.SESSION_FOLDER)) {
             filesystem.mkdirSync(Constants.SESSION_FOLDER);
-        
-        if(!filesystem.existsSync(Constants.SETTINGS_FOLDER))
+        }
+
+        if(!filesystem.existsSync(Constants.SETTINGS_FOLDER)) {
             filesystem.mkdirSync(Constants.SETTINGS_FOLDER);
-        
+        }
+
         // checks if settings file exists
         if(!filesystem.existsSync(`${Constants.SETTINGS_FILE}`)) {
             console.error("the settings file couldn't be found!");
