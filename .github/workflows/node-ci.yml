@@ -10,7 +10,7 @@ on:
     branches: [ dev ]
 
 jobs:
-  build-linux:
+  build:
 
     strategy:
       matrix:
