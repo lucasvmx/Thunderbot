@@ -39,7 +39,7 @@
   "dependencies": {
     "cli-spinner": "^0.2.10",
     "log-timestamp": "^0.3.0",
-    "pkg": "^4.4.9",
+    "pkg": "^5.8.1",
     "puppeteer": "^13.3.0",
     "puppeteer-core": "^3.3.0",
     "qrcode-terminal": "^0.12.0",
